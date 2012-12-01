@@ -31,17 +31,18 @@ class Game
         @BUILDING_TYPE_HARBOR = 7
 
         #BUILDING COSTS
-        @GRANARY_COST = 10
-        @TEMPLE_COST = 20
-        @HOUSE_COST = 5
-        @FARM_COST = 2
-        @HUNTING_LODGE_COST = 2
-        @PASTURE_COST = 3
-        @HARBOR_COST = 5
-        @SAWMILL_COST = 3
+        @GRANARY_COST = 20
+        @TEMPLE_COST = 40
+        @HOUSE_COST = 10
+        @FARM_COST = 10
+        @HUNTING_LODGE_COST = 10
+        @PASTURE_COST = 20
+        @HARBOR_COST = 30
+        @SAWMILL_COST = 10
 
         #DIVERS
         @FOOD_COMSUPTION = 1
+        @MAX_AGE = 50
 
         #PRIORITIES
         @PRIORITY_IDDLE = 0
@@ -77,7 +78,7 @@ class Game
         @map.init()
         @map.draw(@ctxBack)
 
-        @resources = [10,10,200]
+        @resources = [10,10,50]
 
         for i in [1..10]
             @addPeople()
@@ -89,7 +90,7 @@ class Game
         @build @BUILDING_TYPE_SAWMILL 
 
 
-        @priorities = [0,0,0,0,0]
+        @priorities = [0,0,0,0,0,0]
         @technologies = [false, false, false, false, false, false, false, false, false, false, false, false]
 
         @interval = setInterval @myLoop, 100
@@ -141,7 +142,7 @@ class Game
             @resources[@FOOD] = 0
             @priorities[@PRIORITY_FOOD] = numberOfDeath * 4
         else
-            @priorities[@PRIORITY_FOOD] = foodCapacity - @resources[@FOOD]
+            @priorities[@PRIORITY_FOOD] = (foodCapacity - @resources[@FOOD])/3
             @resources[@FOOD] -= sum
 
          #basic food capacity
@@ -155,14 +156,16 @@ class Game
                     @resources[@MANA]++
                 
                 when @BUILDING_TYPE_FARM
-                    foodToAdd += 4
-                
-                when @BUILDING_TYPE_PASTURE
                     foodToAdd += 6
                 
+                when @BUILDING_TYPE_PASTURE
+                    foodToAdd += 10
+                
                 when @BUILDING_TYPE_HUNTING_LODGE
-                    foodToAdd += 2
-                    #depends of boats :)
+                    if @technologies[@TECH_FIRE] 
+                        foodToAdd += 3
+                    else
+                        foodToAdd += 2
                 
                 when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
@@ -194,7 +197,7 @@ class Game
            @peoples.splice deadIndex, 1
 
 
-
+        @priorities[@PRIORITY_FAITH]++
 
         #create peoples
         if numberOfDeath > 0
@@ -204,18 +207,27 @@ class Game
             numberOfBorn = Math.random()*@peoples.length
             #create 1/4 peoples size * random factor
 
+
+        #natural dying
+        #for speople in @peoples
+        #    speople.age++
+        #    shouldDie = (Math.random() * @MAX_AGE < speople.age)
+        #    if shouldDie 
+        #        @peoples.splice(@peoples.indexOf(speople),1)
+        #        console.log "Someone die of his natural death"
+
         bornCounter = Math.floor numberOfBorn
         while bornCounter > 0
             bornCounter--
             if maxPeople == @peoples.length
-                @priorities[@PRIORITY_HOUSE]++
+                @priorities[@PRIORITY_HOUSE]+=3
             else
                 @addPeople()            
 
         #build buildings! (only 1 per turn)
         maxIndex = 0
         for priority,k in @priorities
-            console.log "in loop : k = " + k + "| priority = " + priority
+            #console.log "in loop : k = " + k + "| priority = " + priority
             if priority > @priorities[maxIndex]
                 maxIndex = k
         #console.log "______________________________________________________________"
@@ -224,6 +236,13 @@ class Game
         
 
         @commonSenseBuild maxIndex
+
+
+
+        #discover Technologies
+        #if !@technologies[@TECH_FIRE]
+
+
         
 
     commonSenseBuild: (maxIndex) ->
@@ -251,13 +270,17 @@ class Game
                 else
                     @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
             when @PRIORITY_FOOD
-                #if @build @BUILDING_TYPE_PASTURE or @build @BUILDING_TYPE_FARM or @build @BUILDING_TYPE_HUNTING_LODGE
-                if @build @BUILDING_TYPE_HUNTING_LODGE
+                if @build(@BUILDING_TYPE_PASTURE) or @build(@BUILDING_TYPE_FARM) or @build(@BUILDING_TYPE_HUNTING_LODGE)
                     @priorities[@PRIORITY_FOOD] = 0
 
                 else
                     #we majorate by the strongest cost
                     @priorities[@PRIORITY_WOOD] += @PASTURE_COST
+            when @PRIORITY_HOUSE
+                if @build @BUILDING_TYPE_HOUSE
+                    @priorities[@PRIORITY_HOUSE] = 0
+                else
+                    @priorities[@PRIORITY_WOOD] += @HOUSE_COST
 
 
 
@@ -305,7 +328,10 @@ class Game
                 return true
 
             when @BUILDING_TYPE_PASTURE 
-                if @PASTURE_COST > @resources[@WOOD] or !@technologies[@TECH_BREEDING] then return false
+                console.log "I WANT TO BUILD PASTURE :" + @PASTURE_COST + " > " + @resources[@WOOD]
+                if !@technologies[@TECH_BREEDING]  or @PASTURE_COST > @resources[@WOOD] then return false
+                
+                console.log "dafaq"
                 pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
@@ -315,6 +341,7 @@ class Game
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @PASTURE_COST
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_HOUSE 
@@ -333,6 +360,7 @@ class Game
                 return true
 
             when @BUILDING_TYPE_FARM
+                console.log "I WANT TO BUILD FARM :" + @FARM_COST + " > " + @resources[@WOOD]
                 if @FARM_COST > @resources[@WOOD] or !@technologies[@TECH_AGRICULTURE] then return false
                 #create a new building
                 pos = @findSlot "grass"
@@ -344,6 +372,7 @@ class Game
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @FARM_COST
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_GRANARY 
@@ -366,7 +395,7 @@ class Game
                 pos = @findSlot "mountain"
                 if pos[0] == -1
                     pos = @findSlot "grass"
-                if pos[0] == -1 then return true 
+                    if pos[0] == -1 then return true 
                 building = new Building @BUILDING_TYPE_SAWMILL, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
