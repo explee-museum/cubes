@@ -8,11 +8,12 @@ class Cloud extends WeatherElement
         @image = new Image()
         @image.src = 'img/cloud.png'
 
-        r = Math.random() * 2
+        r = Math.random()
         @width = Math.round(r*251)
         @height = Math.round(r*188)
 
     draw: (ctx) ->
+        ctx.globalAlpha = 0.2
         ctx.drawImage @image, @posX, @posY, @width, @height
 
 if typeof module isnt 'undefined' && module.exports
