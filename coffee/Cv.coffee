@@ -87,7 +87,7 @@ class Cv
                 when r then h = (g - b) / d + (g < b ? 6 : 0)
                 when g then h = (b - r) / d + 2
                 when b then h = (r - g) / d + 4
-            h /= 6        
+            h /= 6                
 
         return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
 
@@ -111,18 +111,22 @@ class Cv
         h = sh
         output = @ctx.createImageData w, h
         dst = output.data
+
+        # dst.set(pixels.data)
         # go through the destination image pixels
         alphaFac = opaque ? 1 : 0;
         for y in [0..h-1]
             for x in [0..w-1]
+                sx = x
+                sy = y
                 dstOff = (y*w+x)*4
                 # calculate the weighed sum of the source image pixels that
                 # fall under the convolution matrix
                 r = g = b = a = 0
                 for wy in [0..side-1]
                     for wx in [0..side-1]
-                        scy = y + wy - halfSide;
-                        scx = x + wx - halfSide;
+                        scy = sy + wy - halfSide;
+                        scx = sx + wx - halfSide;
                         if scy >= 0 and scy < sh and scx >= 0 and scx < sw
                             srcOff = (scy*sw+scx)*4
                             wt = weights[wy*side+wx]
@@ -135,7 +139,6 @@ class Cv
                 dst[dstOff+2] = b
                 dst[dstOff+3] = a + alphaFac*(255-a)
 
-        output.data = dst
         return output
 
 if typeof module isnt 'undefined' && module.exports

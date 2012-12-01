@@ -22,7 +22,7 @@ $ ->
 
 
         game = new Game ctxFront, ctxBack, document.width, document.height
-        game.init()
+        # game.init()
 
 
 

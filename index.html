@@ -15,6 +15,14 @@
   <link rel="stylesheet" href="css/override.css"> 
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="js/libs/modernizr-1.7.min.js"></script>
+  <!-- Grab Google CDN jQuery. fall back to local if necessary -->
+          <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+          <script>window.jQuery || document.write("<script src='js/libs/jquery-1.8.3.min.js'>\x3C/script>")</script>
+
+          <script src="js/libs/plugins.js?v=1"></script>
+          <!--[if lt IE 7 ]>
+            <script src="js/dd_belatedpng.js?v=1"></script>
+          <![endif]--> 
   <style type="text/css">
         #webcam, #back {
             display: none;
@@ -35,20 +43,10 @@
             Dropped frames: 0 Avg: 0<br>
         </div>  
         <div id="color"></div>
-        <video id="webcam" width="640" height="480"></video>
+        <video id="webcam" width="320" height="240"></video>
 
-        <canvas id="back" width="640" height="480"></canvas>
-        <canvas id="front" width="640" height="480"></canvas>
-
-        <script src='js/libs/jquery-1.7.2.min.js'></script>
-        
-        <script src="js/main.js"></script>
-        <script src="js/Game.js"></script>
-        <script src="js/Map.js"></script>
-        <script src="js/People.js"></script>
-        <script src="js/Building.js"></script>
-        <script src="js/Spritesheet.js"></script>
-        <script src="js/SpriteElement.js"></script>
+        <canvas id="back" width="320" height="240"></canvas>
+        <canvas id="front" width="320" height="240"></canvas>
 
         <script type="text/javascript" src="js/BlobDetector.js"></script>
         <script type="text/javascript" src="js/Cv.js"></script>
@@ -84,9 +82,9 @@
             var BlobDetector = new BlobDetector(Cv, backCanvas);
 
             var mousex = mousey = 0;
-            var offset = $(front).offset();
+            var offset = $(canvas).offset();
             var colorDiv = document.getElementById('color');
-            $(front).mousemove(function(e){
+            $(canvas).mousemove(function(e){
                 mousex = Math.floor(e.pageX - offset.left);
                 mousey = Math.floor(e.pageY - offset.top);
                 colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey);
@@ -99,33 +97,34 @@
 
             var log = document.getElementById('log');
             var weight = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9]
+            // var weight = [1, 0, 0, 0, 1, 0, 0, 0, 1]
             function update() {
                 Stats.calculate(log);
                 requestAnimFrame(update);
 
-                // console.log(bounds);
-                getVideoFrame();
-                ctx.clearRect(0,0, 640,480);
+                getVideoFrame();                
 
                 // some freaky functions
-                var pixels = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-                var frame = Cv.convolute(pixels, weight);
+                // var pixels = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+                // var frame = Cv.convolute(pixels, weight, false);
+                // backCtx.putImageData(frame, 0, 0);
+                var rBounds = BlobDetector.detect(35, 50);
+                // var bBounds = BlobDetector.detect(185, 210);
+                // var gBounds = BlobDetector.detect(90, 105);
+
+                frame = backCtx.getImageData(0, 0, canvas.width, canvas.height)
                 ctx.putImageData(frame, 0, 0);
-                // var bounds = BlobDetector.detect(ctx)
 
                 //Draw result
-                // ctx.save();
-                // ctx.strokeStyle = 'red';
-                // ctx.lineWidth = 3;
-                // ctx.strokeRect(bounds.x, bounds.y, 50, 50);
-                // ctx.strokeRect(bounds.minx + (bounds.maxx-bounds.minx)/3,bounds.miny + (bounds.maxy-bounds.miny)/3,50,50);
-                // ctx.restore();
+                ctx.save();
+                ctx.fillStyle = 'red';
+                ctx.fillRect(Math.floor(rBounds.x),Math.floor(rBounds.y), 5, 5);
+                // ctx.strokeStyle = 'blue';
+                // ctx.strokeRect(50 * Math.float(bBounds.x/50), 50 * Math.float(bBounds.y/50), 50, 50);
+                // ctx.strokeStyle = 'green';
+                // ctx.strokeRect(gBounds.x, gBounds.y, 50, 50);
+                ctx.restore();
             }
-            console.log(Cv.rgbToHsl(23, 45, 56));
-            console.log(Cv.indexToXY(640, 641*4));
-            console.log(Cv.XYToIndex(640, 320, 2));
-
         </script>
-
     </body>
 </html>

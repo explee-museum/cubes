@@ -161,7 +161,9 @@ class BlobDetector
     copyPixels: (ctx, srcRect, destPt) ->
         ctx.putImageData srcRect, destPt.x, destPt.y
 
-    detect: (ctx) ->
+    detect: (hmin, hmax) ->
+        # startTime = new Date().getTime()
+
         minx = @canvas.width
         miny = @canvas.height
         maxx = maxy = 0
@@ -169,102 +171,75 @@ class BlobDetector
         height = @canvas.height
 
         frame = @ctx.getImageData(0, 0, width, height)
-        map = []
+        data = frame.data
+        len = frame.data.length-4
+        map = []        
         
-        for i in [0..frame.data.length] by 4
-            r = frame.data[i + 0]
-            g = frame.data[i + 1]
-            b = frame.data[i + 2]
-
-            hsl = @cv.rgbToHsl r, g, b
+        for i in [0..len] by 4
+            hsl = @cv.rgbToHsl data[i + 0], data[i + 1], data[i + 2]
             h = hsl[0]
             s = hsl[1]
             l = hsl[2]
-            # pos = @cv.indexToXY frame, i
-            if (h >= 35 and h <= 50 and s >= 20 and s <= 80 and l >= 20 and l <= 80)
-                frame.data[i + 3] = 1
-                map.push 1
-                # if pos.x < minx then minx = pos.x 
-                # if pos.y < miny then miny = pos.y
-                # if pos.x > maxx then maxx = pos.x
-                # if pos.y > maxy then maxy = pos.y
+            if h >= hmin and h <= hmax and s >= 20 and s <= 80 and l >= 20 and l <= 80
+                map.push 1                
             else
                 map.push 0
 
-        console.log 'map', map.lengh
-        scores = @scoreMap map
-        spot = @targetScore scores
-        ctx.putImageData frame, 0, 0
+        # output = @ctx.createImageData width, height
+        # dst = output.data
+        # for i in [0..map.length-1]
+        #     if map[i] is 1
+        #         dst[i*4] = 255
+        #         dst[i*4+1] = 255
+        #         dst[i*4+2] = 255
+        #         dst[i*4+3] = 255
+        #     else
+        #         dst[i*4] = 0
+        #         dst[i*4+1] = 0
+        #         dst[i*4+2] = 0
+        #         dst[i*4+3] = 255
+
+        spot = @scoreMap map
+        # ctx.putImageData output, 0, 0        
+
+        # stopTime = new Date().getTime()
+        # console.log 'timer detect', stopTime - startTime
 
         return spot
         # return {minx:minx, miny:miny, maxx:maxx, maxy:maxy}
 
     scoreMap: (map) ->
+        # startTime = new Date().getTime()
+        
         width = @canvas.width
         height = @canvas.height
-        scores = []
+        val = 0
+        target = 0        
         for j in [5..height-6]
             for i in [5..width-6]
-                l5 = map[@cv.XYToIndex(width, i-5,j)/4]
-                l4 = map[@cv.XYToIndex(width, i-4,j)/4]
-                l3 = map[@cv.XYToIndex(width, i-3,j)/4]
-                l2 = map[@cv.XYToIndex(width, i-2,j)/4]
-                l1 = map[@cv.XYToIndex(width, i-1,j)/4]
-                r1 = map[@cv.XYToIndex(width, i+1,j)/4]
-                r2 = map[@cv.XYToIndex(width, i+2,j)/4]
-                r3 = map[@cv.XYToIndex(width, i+3,j)/4]
-                r4 = map[@cv.XYToIndex(width, i+4,j)/4]
-                r5 = map[@cv.XYToIndex(width, i+5,j)/4]
-                u5 = map[@cv.XYToIndex(width, i,j-5)/4]
-                u4 = map[@cv.XYToIndex(width, i,j-4)/4]
-                u3 = map[@cv.XYToIndex(width, i,j-3)/4]
-                u2 = map[@cv.XYToIndex(width, i,j-2)/4]
-                u1 = map[@cv.XYToIndex(width, i,j-1)/4]
-                d1 = map[@cv.XYToIndex(width, i,j+1)/4]
-                d2 = map[@cv.XYToIndex(width, i,j+2)/4]
-                d3 = map[@cv.XYToIndex(width, i,j+3)/4]
-                d4 = map[@cv.XYToIndex(width, i,j+4)/4]
-                d5 = map[@cv.XYToIndex(width, i,j+5)/4]
-                center = map[@cv.XYToIndex(width, i,j)/4]
-                # l5 = map[@cv.XYToIndex(width, i-5,j)/4]
-                # l4 = map[@cv.XYToIndex(width, i-4,j)/4]
-                # l3 = map[@cv.XYToIndex(width, i-3,j)/4]
-                # l2 = map[@cv.XYToIndex(width, i-2,j)/4]
-                # l1 = map[@cv.XYToIndex(width, i-1,j)/4]
-                # r1 = map[@cv.XYToIndex(width, i+1,j)/4]
-                # r2 = map[@cv.XYToIndex(width, i+2,j)/4]
-                # r3 = map[@cv.XYToIndex(width, i+3,j)/4]
-                # r4 = map[@cv.XYToIndex(width, i+4,j)/4]
-                # r5 = map[@cv.XYToIndex(width, i+5,j)/4]
-                # u5 = map[@cv.XYToIndex(width, i,j-5)/4]
-                # u4 = map[@cv.XYToIndex(width, i,j-4)/4]
-                # u3 = map[@cv.XYToIndex(width, i,j-3)/4]
-                # u2 = map[@cv.XYToIndex(width, i,j-2)/4]
-                # u1 = map[@cv.XYToIndex(width, i,j-1)/4]
-                # d1 = map[@cv.XYToIndex(width, i,j+1)/4]
-                # d2 = map[@cv.XYToIndex(width, i,j+2)/4]
-                # d3 = map[@cv.XYToIndex(width, i,j+3)/4]
-                # d4 = map[@cv.XYToIndex(width, i,j+4)/4]
-                # d5 = map[@cv.XYToIndex(width, i,j+5)/4]
-                # center = map[@cv.XYToIndex(width, i,j)/4]
-                
-              
-                scores.push l5+l4+l3+l2+l1+r1+r2+r3+r4+r5+u5+u4+u3+u2+u1+d1+d2+d3+d4+d5+center;
-        return scores
+                index = @cv.XYToIndex(width, i-3,j-3)/4
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]
+                index += width
+                val += map[index] + map[index++] + map[index++] + map[index++] + map[index++] + map[index++]    
+                if val > target
+                    pos = {x:i,y:j}
+                    target = val
+                val = 0
 
-    targetScore: (scores) ->
-        target = 0
-        width = @canvas.width
-        console.log scores.length
-        for i in [0..scores.length-1]            
-            if scores[i] > target
-                pos = i
-                target = scores[i]
-
-        return @cv.indexToXY width, pos*4
-
-
-        
+        # stopTime = new Date().getTime()
+        # console.log 'timer scoremap', stopTime - startTime
+        #         
+        return pos
 
 
 if typeof module isnt 'undefined' && module.exports
