@@ -63,6 +63,12 @@ class Game
         @PRIORITY_GRANARY = 4
         @PRIORITY_HOUSE = 5
 
+        #FOOD
+        @FOOD_FARM = 8
+        @FOOD_PASTURE = 12
+        @FOOD_HUNTING = 4
+        @FOOD_HUNTING_FIRE = 6
+
 
 
         #TECH
@@ -140,7 +146,16 @@ class Game
 
         # Perform actions
         for people in @peoples
-            people.walk()
+            if !people.walk()
+                #we have to find him a new goal!
+                j = Math.round (Math.random() * @map.heightMap)
+                i = Math.round (Math.random() * @map.widthMap)
+                while (@map.tiles[i][j].type == "water")
+                    j = Math.round (Math.random() * @map.heightMap)
+                    i = Math.round (Math.random() * @map.widthMap)
+
+                people.findNewGoal i*50,j*50
+
             people.draw @ctxFront
 
         for building in @buildings
@@ -212,10 +227,13 @@ class Game
         console.log "nextTurn"
 
         foodCapacity = 20
+        woodCapacity = 5
 
         for building in @buildings
             if building.type == @BUILDING_TYPE_GRANARY
-                    foodCapacity += 20
+                    foodCapacity += 30
+            if building.type == @BUILDING_TYPE_SAWMILL
+                    woodCapacity += 20
 
         #food expanses
         sum = @peoples.length * @FOOD_COMSUPTION
@@ -238,33 +256,38 @@ class Game
                     @resources[@MANA]++
                 
                 when @BUILDING_TYPE_FARM
-                    foodToAdd += 6
+                    foodToAdd += @FOOD_FARM
                 
                 when @BUILDING_TYPE_PASTURE
-                    foodToAdd += 10
+                    foodToAdd += @FOOD_PASTURE
                 
                 when @BUILDING_TYPE_HUNTING_LODGE
                     if @technologies[@TECH_FIRE] 
-                        foodToAdd += 3
+                        foodToAdd += @FOOD_HUNTING_FIRE
                     else
-                        foodToAdd += 2
+                        foodToAdd += @FOOD_HUNTING
                 
                 when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
                 
                 when @BUILDING_TYPE_HOUSE
                     if @technologies[@TECH_ARCHITECTURE]
-                        maxPeople += 10
+                        maxPeople += 12
                     else
-                        maxPeople += 7
+                        maxPeople += 9
 
         if @resources[@FOOD]+foodToAdd > foodCapacity
             #Our peoples need more granary!
             @priorities[@PRIORITY_GRANARY] = foodToAdd
             foodToAdd = foodCapacity - @resources[@FOOD] 
 
+        if @resources[@WOOD]+woodToAdd > woodCapacity
+            woodToAdd = woodCapacity - @resources[@WOOD] 
+
         @resources[@FOOD] += foodToAdd
         @resources[@WOOD] += woodToAdd
+
+
         
         #Calculate if we need to build more temples
         

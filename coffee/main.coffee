@@ -6,13 +6,16 @@ $ ->
         # CONSTANTS
         $('img').each (i, elem) ->
             $(elem).hide()
+
         #BUILDING TYPES
-        
         canvasFront = document.getElementById 'front'
         ctxFront = canvasFront.getContext '2d'
 
         canvasBack = document.getElementById 'back'
         ctxBack = canvasBack.getContext '2d'
+
+        canvasDebug = document.getElementById 'frontDebug'
+        ctxDebug = canvasBack.getContext '2d'
 
         canvasWeather = document.getElementById 'weather'
         ctxWeather = canvasWeather.getContext '2d'
@@ -23,6 +26,9 @@ $ ->
 
         canvasFront.width = document.width
         canvasFront.height = document.height
+
+        canvasDebug.width = document.width
+        canvasDebug.height = document.height
 
         canvasWeather.width = document.width
         canvasWeather.height = document.height

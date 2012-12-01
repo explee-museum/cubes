@@ -102,3 +102,32 @@ html, body {
     text-align: center;
     color: white;
 }
+
+/* Video section */
+#webcam, #backVideo {
+            display: none;
+            position: absolute;
+            top:50px;
+            left:0;
+            z-index: 3;
+        }
+#frontVideo {
+    position: absolute;
+    top:50px;
+    left:0;
+    z-index: 3;
+}
+#frontDebug {
+    position: absolute;
+    z-index: 3;   
+}
+#log {
+    position: absolute;
+    z-index: 3
+}
+#color {
+    position: absolute;
+    top:30px;
+    left:0;
+    z-index: 3   
+}

@@ -17,9 +17,14 @@
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="js/libs/modernizr-1.7.min.js"></script>
   <script src='js/libs/jquery-1.7.2.min.js'></script>
-
+  
   </head>
-    <body>        
+    <body>
+        <div id="log">
+            Decoded frames: 0 Avg: 0<br>
+            Dropped frames: 0 Avg: 0<br>
+        </div>
+        <div id="color"></div>
         <div id="pop">
             <div id="pop_count"></div>
             <div id="mana_count"></div>
@@ -27,9 +32,9 @@
             <div id="wood_count"></div>
         </div>
 
-        <div id="mic">
-            <input type="text" id="speech_result" x-webkit-speech />
-        </div>
+        <video id="webcam" width="320" height="240"></video>
+        <canvas id="backVideo" width="320" height="240"></canvas>
+        <canvas id="frontVideo" width="320" height="240"></canvas>
 
         <div id="technos">
             
@@ -38,6 +43,10 @@
         <canvas id="back" width="640" height="480"></canvas>
         <canvas id="front" width="640" height="480"></canvas>
         <canvas id="weather" width="640" height="480"></canvas>
+        <canvas id="frontDebug" width="640" height="480"></canvas>
+        <div id="mic">
+            <input type="text" id="speech_result" x-webkit-speech />
+        </div>        
 
         <img src="img/spriteGlobal.png" >
         <img src="img/spritePeople.png" >
@@ -53,5 +62,89 @@
         <script src="js/Building.js"></script>
         <script src="js/Spritesheet.js"></script>
         <script src="js/SpriteElement.js"></script>
+
+        <script type="text/javascript" src="js/BlobDetector.js"></script>
+        <script type="text/javascript" src="js/Cv.js"></script>
+        <script type="text/javascript" src="js/Stats.js"></script>
+        <script type="text/javascript">            
+            //GetUserMedia
+            window.URL = window.URL || window.webkitURL;
+            navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+            var video = document.querySelector('video');
+            var Stats = new Stats(video);
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia({audio: false, video: true}, function(stream) {
+                    Stats.startTest(window.URL.createObjectURL(stream));
+                }, function fail () {
+                    console.log('you fail');
+                });
+            }
+            window.requestAnimFrame = (function(){
+                return  window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function( callback ){
+                        window.setTimeout(canvasllback, 1000 / 60);
+                    };
+            })();
+
+            //Init Video
+            var frontVideoCanvas = document.getElementById('frontVideo');
+            var ctx = frontVideoCanvas.getContext('2d');
+            var backVideoCanvas = document.getElementById('backVideo');
+            var backCtx = backVideoCanvas.getContext('2d');
+            var debugCanvas = document.getElementById('frontDebug');
+            var debugCtx = debugCanvas.getContext('2d');
+
+            var Cv = new Cv(backVideoCanvas);
+            var BlobDetector = new BlobDetector(Cv, backVideoCanvas);
+
+            var mousex = mousey = 0;
+            var offset = $(frontVideoCanvas).offset();
+            var colorDiv = document.getElementById('color');
+            $(frontVideoCanvas).mousemove(function(e){
+                mousex = Math.floor(e.pageX - offset.left);
+                mousey = Math.floor(e.pageY - offset.top);
+                colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey);
+                colorDiv.innerHTML = colorStr;
+            });
+
+            var log = document.getElementById('log');
+            var weight = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9]
+            // var weight = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+            function update() {
+                Stats.calculate(log);
+                //Request a frame
+                requestAnimFrame(update);
+                //Plug the video element to canvas
+                backCtx.drawImage(video, 0, 0, video.width, video.height);                
+
+                frame = backCtx.getImageData(0, 0, backVideoCanvas.width, backVideoCanvas.height)
+                ctx.putImageData(frame, 0, 0);
+
+                //Draw result
+                var rBounds = BlobDetector.detect(35, 50, ctx);
+                var rb = Cv.convertBounds(rBounds, frontVideoCanvas, debugCanvas);
+
+                var bBounds = BlobDetector.detect(185, 210, ctx);
+                var bb = Cv.convertBounds(bBounds, frontVideoCanvas, debugCanvas);
+
+                var gBounds = BlobDetector.detect(90, 105, ctx)
+                var gb = Cv.convertBounds(gBounds, frontVideoCanvas, debugCanvas);
+                
+                ctx.fillStyle = 'red';
+                ctx.fillRect(Math.floor(rBounds.x), Math.floor(rBounds.y), 5, 5);
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(Math.floor(gBounds.x), Math.floor(gBounds.y), 5, 5);
+
+                debugCanvas.width = debugCanvas.width
+                debugCtx.fillStyle = 'red';
+                debugCtx.fillRect(50 * Math.floor(rb.x/50), 50 * Math.floor(rb.y/50), 50, 50);
+                debugCtx.fillStyle = 'blue';
+                debugCtx.fillRect(50 * Math.floor(bb.x/50), 50 * Math.floor(bb.y/50), 50, 50);
+                debugCtx.fillStyle = 'green';
+                debugCtx.fillRect(50 * Math.floor(gb.x/50), 50 * Math.floor(gb.y/50), 50, 50);
+            }
+        </script>
     </body>
 </html>
