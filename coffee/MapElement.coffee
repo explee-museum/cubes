@@ -9,6 +9,7 @@ class MapElement
                 @sprites = [new SpriteElement(spritesheetGlobal, 1, 1), new SpriteElement(spritesheetGlobal, 1, 2)]
 
         @size =  size / spritesheetGlobal.offset
+        @building = null
         @init()
 
     init: () ->
@@ -29,6 +30,9 @@ class MapElement
                 spriteElem = @tiles[i][j]
                 # ctx.drawImage spriteElem.spritesheet.image, spriteElem.i * spriteElem.spritesheet.offset, spriteElem.j * spriteElem.spritesheet.offset, i*spriteElem.spritesheet.offset, j*spriteElem.spritesheet.offset, x*50*i*10, y*50*j*10, 10, 10 
                 ctx.drawImage spriteElem.spritesheet.image, spriteElem.i * 10, spriteElem.j * 10, 10, 10, x*50+i*10, y*50+j*10, 10, 10
+
+
+                    
 
 if typeof module isnt 'undefined' && module.exports
     exports.MapElement = MapElement

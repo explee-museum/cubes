@@ -26,19 +26,19 @@ class Game
         console.log "nextTurn"
         #food expanses
         sum = @peoples.length * FOOD_COMSUPTION
-        if  sum > ressources[FOOD]
-            numberOfDeath = sum - ressources[FOOD]
-            ressources[FOOD] = 0
+        if  sum > @ressources[FOOD]
+            numberOfDeath = sum - @ressources[FOOD]
+            @ressources[FOOD] = 0
             @priorities[PRIORITY_FOOD] = numberOfDeath * 2
         else
-            @priorities[PRIORITY_FOOD] = - ressources[FOOD]
+            @priorities[PRIORITY_FOOD] = - @ressources[FOOD]
 
         foodCapacity = 20 #basic food capacity
         maxPeople = 5 #basic max of people
         for buiding in @buildings
             switch building.type
                 when BUILDING_TYPE_TEMPLE
-                    ressources[MANA]++
+                    @ressources[MANA]++
                 when BUILDING_TYPE_FARM
                     foodToAdd += 4
                 when BUILDING_TYPE_PASTURE
@@ -53,10 +53,10 @@ class Game
                 when BUILDING_TYPE_HOUSE
                     maxPeople +=7
 
-        if ressources[FOOD]+foodToAdd > foodCapacity
+        if @ressources[FOOD]+foodToAdd > foodCapacity
             #Our peoples need more granary!
             @priorities[PRIORITY_GRANARY] = @ressources[FOOD]+foodToAdd - foodCapacity
-            foodToAdd = foodCapacity - ressources[FOOD] 
+            foodToAdd = foodCapacity - @ressources[FOOD] 
 
         @ressources[FOOD] += foodToAdd
         @ressources[WOOD] += woodToAdd
@@ -75,15 +75,17 @@ class Game
 
         #create peoples
         if numberOfDeath > 0
-
-        #    numberOfBorn = 0.125*Math.floor Math.random()*
-            
-
-            #create 1/4 peoples size * random factor
+            numberOfBorn = 0.125* Math.random()*@peoples.length
+            #create 1/8 peoples size * random factor
         else
-            #create 1/2 peoples size * random factor
+            numberOfBorn = 0.250* Math.random()*@peoples.length
+            #create 1/4 peoples size * random factor
 
-        #@peoples.push(new People)
+        bornCounter = Math.floor numberOfBorn
+        while bornCounter > 0
+            bornCounter--
+            @peoples.push(new People)
+            
 
         #build buildings! (only 1 per turn)
         maxIndex = 0
@@ -127,7 +129,8 @@ class Game
                     @priorities[PRIORITY_WOOD] += PASTURE_COST
 
 
-    #We can only build on empty cases
+    #Waiting for a integer : building type
+    #We can only build on empty slot
     build: (type) ->
         #BUILDING_TYPE_TEMPLE = 0
         #BUILDING_TYPE_HOUSE = 1
@@ -142,56 +145,107 @@ class Game
         switch type
             when BUILDING_TYPE_TEMPLE
                 if TEMPLE_COST > @ressources[WOOD] then return false
-                pos = findSlot GRASS
-                #create a new building
+                #find a slot for the building
+                pos = findSlot "sand"
+                if pos[0] == -1 
+                    pos = findSlot "grass"
+                    if pos[0] == -1 then return true #we don't build it, and we can't :(
+                building = new Building BUILDING_TYPE_TEMPLE
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= TEMPLE_COST
                 return true
+
             when BUILDING_TYPE_HUNTING_LODGE
                 if HUNTING_LODGE_COST > @ressources[WOOD] then return false
                 #create a new building
+                pos = findSlot "grass"
+                if pos[0] == -1 then return true #we don't build it, and we can't :(
+                building = new Building BUILDING_TYPE_HUNTING_LODGE
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= HUNTING_LODGE_COST
                 return true
+
             when BUILDING_TYPE_PASTURE 
                 if PASTURE_COST > @ressources[WOOD] or !@technologies[TECH_BREEDING] then return false
-                #create a new building
+                pos = findSlot "mountain"
+                if pos[0] == -1 then return true #we don't build it, and we can't :(
+                
+                building = new Building BUILDING_TYPE_PASTURE
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= PASTURE_COST
                 return true
+
             when BUILDING_TYPE_HOUSE 
                 if HOUSE_COST > @ressources[WOOD] then return false
-                #create a new building
+                pos = findSlot "grass"
+                if pos[0] == -1 then return true
+                
+                building = new Building BUILDING_TYPE_HOUSE
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= HOUSE_COST
                 return true
+
             when BUILDING_TYPE_FARM
                 if FARM_COST > @ressources[WOOD] or !@technologies[TECH_AGRICULTURE] then return false
                 #create a new building
+                pos = findSlot "grass"
+                if pos[0] == -1 then return true #we don't build it, and we can't :(
+                
+                building = new Building BUILDING_TYPE_FARM
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= FARM_COST
                 return true
+
             when BUILDING_TYPE_GRANARY 
                 if GRANARY_COST > @ressources[WOOD] then return false
-                #create a new building
+                pos = findSlot "grass"
+                if pos[0] == -1 then return true 
+                building = new Building BUILDING_TYPE_GRANARY
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= GRANARY_COST
                 return true
+
             when BUILDING_TYPE_SAWMILL 
                 if SAWMILL_COST > @ressources[WOOD] then return false
-                #create a new building
+                pos = findSlot "mountain"
+                if pos[0] == -1
+                    pos = findSlot "grass"
+                if pos[0] == -1 then return true 
+                building = new Building BUILDING_TYPE_SAWMILL
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @ressources[WOOD] -= SAWMILL_COST
                 return true
+
             when BUILDING_TYPE_HARBOR
                 if HARBOR_COST > @ressources[WOOD] or !@technologies[TECH_FISH] then return false
                 #create a new building
                 return true
 
-
+    #type : string
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
-    findSlot: (type) ->
+    findSlot: (searchType) ->
+        for i in [0..@map.tiles.widthMap]
+            for j in [0..@map.tiles.heightMap]
+                if @map.tiles[i][j].type == searchType and @map.tiles[i][j].building == null
+                    return [i,j]
+        return [-1,-1]
 
-        if noSlotsLeft then return false
-        switch type
-            when BUILDING_TYPE_TEMPLE
-                if TEMPLE_COST > @ressources[WOOD] then return false
-                #create a new building
-                return true
-            when BUILDING_TYPE_HUNTING_LODGE
-                if GRANARY_COST > @ressources[WOOD] then return false
-                #create a new building
-                return true
-            when BUILDING_TYPE_PASTURE 
-                if GRANARY_COST > @ressources[WOOD] or !@technologies[TECH_BREEDING] then return false
-                #create a new building
-                return true
+
+
 
 if typeof module isnt 'undefined' && module.exports
     exports.Game = Game

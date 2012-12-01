@@ -9,6 +9,8 @@ class People
         @age = 0
 
     walk: () ->
+        @poxX += Math.floor Math.random * 4 -2
+        @poxY += Math.floor Math.random * 4 -2
 
     draw: () ->
     
