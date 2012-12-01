@@ -14,7 +14,7 @@ $ ->
         ctxBack = canvasBack.getContext '2d'
 
         canvasWeather = document.getElementById 'weather'
-        ctxWeather = canvasBack.getContext '2d'
+        ctxWeather = canvasWeather.getContext '2d'
 
         # initialize size
         canvasBack.width = document.width
@@ -22,6 +22,9 @@ $ ->
 
         canvasFront.width = document.width
         canvasFront.height = document.height
+
+        canvasWeather.width = document.width
+        canvasWeather.height = document.height
 
         game = new Game ctxFront, ctxBack, document.width, document.height
         game.init()
@@ -47,4 +50,4 @@ $ ->
                 else
                     game.weather = game.WEATHER_SUN
             
-            game.weatherHasChanged = true
+            game.drawWeather ctxWeather
