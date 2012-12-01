@@ -13,6 +13,9 @@ $ ->
         canvasDebug = document.getElementById 'frontDebug'
         ctxDebug = canvasBack.getContext '2d'
 
+        canvasWeather = document.getElementById 'weather'
+        ctxWeather = canvasWeather.getContext '2d'
+
         # initialize size
         canvasBack.width = document.width
         canvasBack.height = document.height
@@ -23,12 +26,31 @@ $ ->
         canvasDebug.width = document.width
         canvasDebug.height = document.height
 
+        canvasWeather.width = document.width
+        canvasWeather.height = document.height
+
         game = new Game ctxFront, ctxBack, document.width, document.height
         game.init()
 
-        # webcam = document.getElementById 'webcam'
-        # frontVideoCanvas = document.getElementById 'frontVideo'
-        # backVideoCanvas = document.getElementById 'backVideo'
+        micVisible = false
+        $('#mic').click () ->
+            if not micVisible
+                $(this).animate({
+                    'margin-right': -20
+                    }, 300)
+                micVisible = true
 
-        # window.video = new Video webcam, frontVideoCanvas, backVideoCanvas
-        # video.init()
+        document.getElementById('speech_result').onwebkitspeechchange = (val) ->
+            switch val.target.value
+                when 'rain'
+                    game.weather = game.WEATHER_RAIN
+                when 'warm'
+                    game.weather = game.WEATHER_WARM
+                when 'snow'
+                    game.weather = game.WEATHER_SNOW
+                when 'sun'
+                    game.weather = game.WEATHER_SUN
+                else
+                    game.weather = game.WEATHER_SUN
+            
+            game.drawWeather ctxWeather

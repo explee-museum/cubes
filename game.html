@@ -38,11 +38,16 @@
 
         <canvas id="back" width="640" height="480"></canvas>
         <canvas id="front" width="640" height="480"></canvas>
+        <canvas id="weather" width="640" height="480"></canvas>
         <canvas id="frontDebug" width="640" height="480"></canvas>
+        <div id="mic">
+            <input type="text" id="speech_result" x-webkit-speech />
+        </div>        
 
         <img src="img/spriteGlobal.png" >
         <img src="img/spritePeople.png" >
         <img src="img/spriteBuildings.png" >
+        <img src="img/cloud.png" >
         
         <script src="js/main.js"></script>
         <script src="js/Game.js"></script>
@@ -107,11 +112,6 @@
                 //Plug the video element to canvas
                 backCtx.drawImage(video, 0, 0, video.width, video.height);                
 
-                // some freaky functions
-                // var pixels = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-                // var frame = Cv.convolute(pixels, weight, false);
-                // backCtx.putImageData(frame, 0, 0);
-
                 frame = backCtx.getImageData(0, 0, backVideoCanvas.width, backVideoCanvas.height)
                 ctx.putImageData(frame, 0, 0);
 
@@ -124,8 +124,7 @@
 
                 var gBounds = BlobDetector.detect(90, 105, ctx)
                 var gb = Cv.convertBounds(gBounds, frontVideoCanvas, debugCanvas);
-                // ctx.fillStyle = 'red';
-                // ctx.fillRect(Math.floor(rBounds.x),Math.floor(rBounds.y), 5, 5);
+                
                 ctx.fillStyle = 'red';
                 ctx.fillRect(Math.floor(rBounds.x), Math.floor(rBounds.y), 5, 5);
                 ctx.fillStyle = 'blue';
@@ -140,8 +139,6 @@
                 debugCtx.fillRect(50 * Math.floor(bb.x/50), 50 * Math.floor(bb.y/50), 50, 50);
                 debugCtx.fillStyle = 'green';
                 debugCtx.fillRect(50 * Math.floor(gb.x/50), 50 * Math.floor(gb.y/50), 50, 50);
-                // ctx.strokeStyle = 'green';
-                // ctx.strokeRect(gBounds.x, gBounds.y, 50, 50);
             }
         </script>
     </body>

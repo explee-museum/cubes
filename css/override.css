@@ -8,14 +8,20 @@ html, body {
 #front {
     overflow: hidden;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
 }
 
 #back {
     position: absolute;
-    z-index: 0;
+    z-index: 1;
     overflow: hidden;
     /*background: green;*/
+}
+
+#weather {
+    position: absolute;
+    z-index: 3;
+    overflow: hidden; 
 }
 
 #pop {
@@ -65,6 +71,24 @@ html, body {
     font-size: 1em;  
 }
 
+#mic {
+    background: url(../img/mic.png) no-repeat 0px 0px;
+    position: absolute;
+    right:0px;
+    top: 10%;
+    width: 300px;
+    height: 70px;
+    z-index:10;
+    cursor: pointer;
+    margin-right: -230px;
+}
+
+#mic input {
+    margin-top: 23px;
+    margin-left: 70px;
+}
+
+/* Video section */
 #webcam, #backVideo {
             display: none;
             position: absolute;
