@@ -75,11 +75,11 @@ class Game
         @map.draw(@ctxBack)
 
 
-        @resources = [400,200,0]
+        @resources = [10,200,0]
 
         centerX = Math.round(@map.widthMap/2)
         centerY = Math.floor(@map.heightMap/2)
-        for i in [1..200]
+        for i in [1..10]
             r = Math.round(Math.random() * (@spritePeopleElements.length-1))
             people = new People centerX*50, centerY*50, @spritePeopleElements[r]
             people.draw(@ctxFront)
@@ -89,8 +89,6 @@ class Game
         @build @BUILDING_TYPE_HOUSE
         @build @BUILDING_TYPE_HUNTING_LODGE
         @build @BUILDING_TYPE_SAWMILL
-
-
 
         @interval = setInterval @myLoop, 100
 
@@ -191,7 +189,11 @@ class Game
         for  k,priority in @priorities
             if priority > @priorities[maxIndex]
                 maxIndex = k
+        console.log "______________________________________________________________"
+        console.log "Want to build food : " + @priorities[@PRIORITY_FOOD]
+        console.log "PRIORITY : " + maxIndex + "| Value : " + @priorities[maxIndex]
         
+
         @commonSenseBuild maxIndex
         
 
@@ -226,6 +228,7 @@ class Game
                 else
                     #we majorate by the strongest cost
                     @priorities[@PRIORITY_WOOD] += @PASTURE_COST
+
 
 
     #Waiting for a integer : building type
