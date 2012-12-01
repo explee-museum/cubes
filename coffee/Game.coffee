@@ -88,6 +88,9 @@ class Game
         # Clear front canvas
         @ctxFront.clearRect 0, 0, @width, @height
         
+        document.getElementById('pop_count').innerHTML = @peoples.length
+        document.getElementById('mana_count').innerHTML = @resources[0]
+
         if @realInterval % 30 == 0
             @nextTurn()
 

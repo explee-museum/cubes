@@ -17,3 +17,32 @@ html, body {
     overflow: hidden;
     /*background: green;*/
 }
+
+#pop {
+    position: absolute;
+    top:0px;
+    left:50%;
+    margin-left: -175px;
+    z-index: 10;
+    width: 354px;
+    height:46px;
+    background: url(../img/menuTop.png) no-repeat;
+}
+
+#pop #pop_count {
+    position: absolute;
+    z-index: 11;
+    left:50%;
+    margin-left: -112px;
+    top:9px;
+    font-size: 1.4em;
+}
+
+#pop #mana_count {
+    position: absolute;
+    z-index: 11;
+    left:50%;
+    margin-left: 52px;
+    top:9px;
+    font-size: 1.4em;
+}
