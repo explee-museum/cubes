@@ -6,6 +6,7 @@ class People
         @path = []
         @state = 'IDLE'
         @goal = 'NONE'
+        @age = 0
 
     walk: () ->
 
