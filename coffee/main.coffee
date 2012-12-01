@@ -1,11 +1,8 @@
 $ ->
-
-    # loading des assets
-    global = 'img/spriteGlobal.png'
-    img = new Image()
-    img.src = global
-    img.onload = () ->
-
+    window.onload = () ->
+    # img = new Image()
+    # img.src = 'img/spriteGlobal.png'
+    # img.onload = () ->
         # CONSTANTS
 
         #BUILDING TYPES

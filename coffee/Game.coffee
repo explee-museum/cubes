@@ -8,18 +8,42 @@ class Game
         @priorities = [] 
         @fps = 50
         
+        # Sprite for peoples
+        @spritePeople = new Spritesheet 'img/spritePeople.png', 8
+        @spritePeopleElements = [] 
+        @spritePeopleElements.push new SpriteElement(@spritePeople, 0, 0)
+        @spritePeopleElements.push new SpriteElement(@spritePeople, 1, 0)
+        @spritePeopleElements.push new SpriteElement(@spritePeople, 2, 0)
+        @spritePeopleElements.push new SpriteElement(@spritePeople, 3, 0)
     
     init: () ->
         # First, we initialize all the spritesheets
-
         @map = new Map(@width, @height)
         @map.init()
-
         @map.draw(@ctxBack)
 
 
+        centerX = Math.round(@map.widthMap/2)
+        centerY = Math.floor(@map.heightMap/2)
+        for i in [1..20]
+            r = Math.round(Math.random() * (@spritePeopleElements.length-1))
+            people = new People centerX*50, centerY*50, @spritePeopleElements[r]
+            people.draw(@ctxFront)
 
     loop: () ->
+        # Perform actions
+
+        for people in peoples
+            people.draw @ctxFront
+
+
+        # Clear front canvas
+        @ctxFront.clearRect 0, 0, @width, @height
+
+
+
+
+
 
 
     nextTurn: () ->

@@ -1,8 +1,5 @@
 class People
-    constructor: () ->
-        @posX = 0
-        @posY = 0
-        @spriteElem = null
+    constructor: (@posX, @posY, @spriteElement=null) ->
         @path = []
         @state = 'IDLE'
         @goal = 'NONE'
@@ -10,7 +7,8 @@ class People
 
     walk: () ->
 
-    draw: () ->
+    draw: (ctx) ->
+        ctx.drawImage @spriteElement.spritesheet.image, 0, 0, 8, 8, @posX, @posY, 8, 8
     
 if typeof module isnt 'undefined' && module.exports
     exports.People = People

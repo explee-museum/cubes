@@ -4,9 +4,13 @@ class MapElement
         @tiles = []
         switch @type
             when "water"
-                @sprites = [new SpriteElement(spritesheetGlobal, 0, 1), new SpriteElement(spritesheetGlobal, 0, 2)]
+                @sprites = [new SpriteElement(spritesheetGlobal, 0, 1), new SpriteElement(spritesheetGlobal, 1, 1)]
             when "grass"
-                @sprites = [new SpriteElement(spritesheetGlobal, 1, 1), new SpriteElement(spritesheetGlobal, 1, 2)]
+                @sprites = [new SpriteElement(spritesheetGlobal, 0, 0), new SpriteElement(spritesheetGlobal, 1, 0)]
+            when "sand"
+                @sprites = [new SpriteElement(spritesheetGlobal, 0, 2), new SpriteElement(spritesheetGlobal, 1, 2)]
+            when "mountain"
+                @sprites = [new SpriteElement(spritesheetGlobal, 0, 3)]
 
         @size =  size / spritesheetGlobal.offset
         @init()
@@ -15,14 +19,12 @@ class MapElement
         for i in [0...@size]
             temp = []
             for j in [0...@size]
-                temp.push @sprites[0]
+                numTem = Math.round(Math.random() * (@sprites.length-1))
+                temp.push @sprites[numTem]
 
             @tiles.push temp
 
     draw: (ctx, x, y) ->
-        img = new Image()
-        img.src = 'img/spriteGlobal.png'
-
         for i in [0...@size]
             for j in [0...@size]
                 # console.log 'drawing tile...'
