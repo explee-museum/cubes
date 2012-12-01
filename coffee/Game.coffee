@@ -1,5 +1,5 @@
 class Game
-    constructor: (@ctxFront, @ctxBack, @width, @height) ->
+    constructor: (@ctxFront, @ctxBack, @ctxWeather, @width, @height) ->
         @resources = []
         @map = null
         @peoples = []
@@ -12,6 +12,9 @@ class Game
 
         @weather = 0
         @timeSameWeather = 0
+
+        @weatherElements = []
+        @weatherDraw = false
 
         @interval = null
         @realInterval = 0
@@ -126,6 +129,24 @@ class Game
 
         if @realInterval % 30 == 0
             @nextTurn()
+            @addWeatherElements()
+
+        if @realInterval % 50 == 0
+            document.getElementById('technos').innerHTML = ''
+
+        if @weatherDraw && @realInterval % 10 == 0
+            @ctxWeather.clearRect 0, 0, @width, @height
+            
+            if @weather == @WEATHER_SNOW
+                @ctxWeather.globalAlpha = 0.2
+                @ctxWeather.fillStyle = 'white'
+                @ctxWeather.fillRect 0, 0, @width, @height
+
+            for elem in @weatherElements
+                elem.posX += Math.round(Math.random() * 30)
+                elem.posY += 3
+                elem.draw @ctxWeather
+
 
         # Perform actions
         for people in @peoples
@@ -154,27 +175,57 @@ class Game
 
         return people
 
-    drawWeather: (ctx) ->
+    addWeatherElements: () ->
         if @weather == @WEATHER_SNOW
-            console.log 'snow'
+            r = Math.round(Math.random() * 5) 
+            for i in [0..r]
+                snow = new Snow Math.round(Math.random()*@width/10) - 100, Math.round(Math.random()*@height)
+                @weatherElements.push snow
+
+            @weatherDraw = true
 
         else if @weather == @WEATHER_WARM
             console.log 'warm'
 
         else if @weather == @WEATHER_RAIN
-            console.log 'rain'
-            img = new Image()
-            img.src = 'img/cloud.png'
+            @ctxWeather.globalAlpha = 0.2
 
-            ctx.globalAlpha = 0.2
-
-            r = Math.round(Math.random() * 10)
+            r = Math.round(Math.random() * 3)
             for i in [0..r]
-                ctx.drawImage img, Math.round(Math.random()*@width), Math.round(Math.random()*@height), 251, 188
+                cloud = new Cloud Math.round(Math.random()*@width/15) - 100, Math.round(Math.random()*@height)
+                @weatherElements.push cloud
+
+            @weatherDraw = true
+
+    drawWeather: () ->
+        if @weather == @WEATHER_SNOW
+            @weatherElements = []
+
+            r = Math.round(Math.random() * 10) + 40
+            for i in [0..r]
+                snow = new Snow Math.round(Math.random()*@width), Math.round(Math.random()*@height)
+                @weatherElements.push snow
+
+            @weatherDraw = true
+
+        else if @weather == @WEATHER_WARM
+            console.log 'warm'
+
+        else if @weather == @WEATHER_RAIN
+            @weatherElements = []
+            @ctxWeather.globalAlpha = 0.2
+
+            r = Math.round(Math.random() * 10) + 5
+            for i in [0..r]
+                cloud = new Cloud Math.round(Math.random()*@width), Math.round(Math.random()*@height)
+                @weatherElements.push cloud
+
+            @weatherDraw = true
+                
         else
             console.log 'else'
-            ctx.globalAlpha = 0
-            ctx.clearRect 0, 0, @width, @height
+            @ctxWeather.globalAlpha = 0
+            @ctxWeather.clearRect 0, 0, @width, @height
 
     nextTurn: () ->
         console.log "nextTurn"
@@ -271,12 +322,15 @@ class Game
 
 
         #natural dying
-        #for speople in @peoples
-        #    speople.age++
-        #    shouldDie = (Math.random() * @MAX_AGE < speople.age)
-        #    if shouldDie 
-        #        @peoples.splice(@peoples.indexOf(speople),1)
-        #        console.log "Someone die of his natural death"
+        toRemove = []
+        for speople, k in @peoples
+            speople.age++
+            if Math.random() * @MAX_AGE < speople.age
+                toRemove.push k
+
+        for i in toRemove
+            console.log 'DIED FROM NATURAL DEATH'
+            @peoples.splice i, 1
 
         bornCounter = Math.floor numberOfBorn
         while bornCounter > 0
@@ -315,8 +369,8 @@ class Game
 
 
         #discover Technologies
-        if !@technologies[@TECH_FIRE] and @weather = @WEATHER_RAIN and @DEATH_FROM_ICE >= 5
-            discover @TECH_FIRE
+        if !@technologies[@TECH_FIRE] and @weather == @WEATHER_RAIN and @DEATH_FROM_ICE >= 5
+            @discover @TECH_FIRE
 
         if !@technologies[@TECH_WHEEL]
             mountainCount = 0
@@ -326,24 +380,24 @@ class Game
             if mountainCount > 4 then discover @TECH_WHEEL
 
         if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
-            discover @TECH_AGRICULTURE
+            @discover @TECH_AGRICULTURE
 
         if !@technologies[@TECH_BREEDING] and @technologies[@TECH_FIRE]
             hunterCount = 0
             for building in @buildings
-                if building.type == BUILDING_TYPE_HUNTING_LODGE then hunterCount++
+                if building.type == @BUILDING_TYPE_HUNTING_LODGE then hunterCount++
             if hunterCount > 5
-                discover @TECH_BREEDING
+                @discover @TECH_BREEDING
 
         if !@technologies[@TECH_PAPER] and @technologies[@TECH_FIRE] and @peoples.length > 100
-            discover @TECH_PAPER
+            @discover @TECH_PAPER
 
 
         if !@technologies[@TECH_ARCHITECTURE] and @technologies[@TECH_PAPER] and @peoples.length > 200
             templeCount = 0
             for building in @buildings
-                if building.type == BUILDING_TYPE_TEMPLE then templeCount++
-            discover @TECH_ARCHITECTURE
+                if building.type == @BUILDING_TYPE_TEMPLE then templeCount++
+            @discover @TECH_ARCHITECTURE
     
 
         if oldWeather != @weather
@@ -359,6 +413,26 @@ class Game
 
     discover: (indexTechno) ->
         @technologies[indexTechno] = true
+
+        name = ''
+        if indexTechno == @TECH_ARCHITECTURE
+            name = 'architecture'
+        else if indexTechno == @TECH_PAPER
+            name = 'paper'
+        else if indexTechno == @TECH_FIRE
+            name = 'fire'
+        else if indexTechno == @TECH_BREEDING
+            name = 'breeding'
+        else if indexTechno == @TECH_WHEEL
+            name = 'wheel'
+        else if indexTechno == @TECH_AGRICULTURE
+            name = 'agriculture'
+        else if indexTechno == @TECH_FISH
+            name = 'fish'
+
+        document.getElementById('technos').innerHTML = 'You just discovered ' + name + '!'
+
+        console.log 'DISCOVERED ' + name
 
     commonSenseBuild: (maxIndex) ->
         #PRIORITY_IDDLE = 0

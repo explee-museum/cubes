@@ -99,6 +99,18 @@ class Cv
         if hex.length is 1 then ret = "0" + hex else ret = hex
         return ret
 
+    convertBounds: (bounds, incanvas, outcanvas) ->
+        wProportion = outcanvas.width / incanvas.width;
+        hProportion = outcanvas.height / incanvas.height;
+        x = Math.floor bounds.x
+        y = Math.floor bounds.y
+
+        newBounds = 
+            x: x * wProportion
+            y: y * hProportion
+
+        return newBounds
+
     convolute: (pixels, weights, opaque) ->
         side = Math.round(Math.sqrt(weights.length))
         halfSide = Math.floor(side/2);

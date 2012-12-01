@@ -161,7 +161,7 @@ class BlobDetector
     copyPixels: (ctx, srcRect, destPt) ->
         ctx.putImageData srcRect, destPt.x, destPt.y
 
-    detect: (hmin, hmax) ->
+    detect: (hmin, hmax, ctx) ->
         # startTime = new Date().getTime()
 
         minx = @canvas.width
@@ -180,7 +180,8 @@ class BlobDetector
             h = hsl[0]
             s = hsl[1]
             l = hsl[2]
-            if h >= hmin and h <= hmax and s >= 20 and s <= 80 and l >= 20 and l <= 80
+            if h >= hmin and h <= hmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
+                data[i+3] = 0
                 map.push 1                
             else
                 map.push 0
@@ -200,7 +201,8 @@ class BlobDetector
         #         dst[i*4+3] = 255
 
         spot = @scoreMap map
-        # ctx.putImageData output, 0, 0        
+
+        ctx.putImageData(frame, 0, 0) if ctx?
 
         # stopTime = new Date().getTime()
         # console.log 'timer detect', stopTime - startTime
@@ -215,6 +217,7 @@ class BlobDetector
         height = @canvas.height
         val = 0
         target = 0        
+        pos = {x:0; y:0}
         for j in [5..height-6]
             for i in [5..width-6]
                 index = @cv.XYToIndex(width, i-3,j-3)/4

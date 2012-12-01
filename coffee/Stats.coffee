@@ -6,9 +6,9 @@ class Stats
         @droppedFPS = 0
         @startTime = 0
 
-        @video.addEventListener "playing", (event) ->
+        @video.addEventListener "playing", (event) =>
             @startTime = new Date().getTime()
-            update()            
+            update()
 
         @video.addEventListener "error", () -> 
            @endTest(false)
