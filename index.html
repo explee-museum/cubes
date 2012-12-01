@@ -19,6 +19,13 @@
         #webcam, #back {
             display: none;
             position: absolute;
+            top:40;
+            left:0;
+        }
+        #front {
+            position:absolute;
+            top:40;
+            left:0;
         }
     </style>
   </head>
@@ -81,30 +88,50 @@
             var backCanvas = document.getElementById('back');
             var backCtx = backCanvas.getContext('2d');
 
-            var BlobDetector = new BlobDetector(backCanvas);
-            var Cv = new Cv();
+            var Cv = new Cv(backCanvas);
+            var BlobDetector = new BlobDetector(Cv, backCanvas);
 
             var mousex = mousey = 0;
             var offset = $(front).offset();
+            var colorDiv = document.getElementById('color');
             $(front).mousemove(function(e){
                 mousex = Math.floor(e.pageX - offset.left);
                 mousey = Math.floor(e.pageY - offset.top);
-                document.getElementById('color').innerHTML = BlobDetector.getPixelColor(backCtx.getImageData(), mousex, mousey);
+                colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey);
+                colorDiv.innerHTML = colorStr;
             });
 
-            function drawFrame() {
-                ctx.drawImage(video, 0, 0, video.width, video.height);
+            function getVideoFrame() {
+                backCtx.drawImage(video, 0, 0, video.width, video.height);
             }
 
+            var log = document.getElementById('log');
+            var weight = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9]
             function update() {
-                Stats.calculate();
+                Stats.calculate(log);
+                requestAnimFrame(update);
+
+                // console.log(bounds);
+                getVideoFrame();
+                ctx.clearRect(0,0, 640,480);
 
                 // some freaky functions
-                yellowSquare();
+                var pixels = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+                var frame = Cv.convolute(pixels, weight);
+                ctx.putImageData(frame, 0, 0);
+                // var bounds = BlobDetector.detect(ctx)
 
-                requestAnimFrame(update);
-                drawFrame();
+                //Draw result
+                // ctx.save();
+                // ctx.strokeStyle = 'red';
+                // ctx.lineWidth = 3;
+                // ctx.strokeRect(bounds.x, bounds.y, 50, 50);
+                // ctx.strokeRect(bounds.minx + (bounds.maxx-bounds.minx)/3,bounds.miny + (bounds.maxy-bounds.miny)/3,50,50);
+                // ctx.restore();
             }
+            console.log(Cv.rgbToHsl(23, 45, 56));
+            console.log(Cv.indexToXY(640, 641*4));
+            console.log(Cv.XYToIndex(640, 320, 2));
 
         </script>
 

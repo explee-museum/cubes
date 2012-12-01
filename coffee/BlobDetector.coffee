@@ -1,5 +1,5 @@
 class BlobDetector
-    constructor: (@canvas, @filters) ->
+    constructor: (@cv, @canvas, @filters) ->
         @ctx = @canvas.getContext '2d'
 
     process: () ->
@@ -70,7 +70,7 @@ class BlobDetector
         if rect1? then return
 
         x = rect1.x
-        for y in [rect1.y..rect1.y + rect1.height]
+        for y in [rect1.y..rect1.y + rect1.height-1]
             if r.data[(y * r.width * 4) + x * 4] is 255 and r.data[(y * r.width * 4) + x * 4 + 1] is 255 and r.data[(y * r.width * 4) + x * 4 + 2] is 255 
                 ctx.fillStyle = "rgb(127,127,127)"
                 ctx.fillRect x, y, 1, 1
@@ -135,18 +135,17 @@ class BlobDetector
         @ctx.strokeRect xMin, yMin, xMax - xMin, yMax - yMin
         @ctx.restore()
 
-    getPixelColor: (imageData, x, y) ->
-        p = [
-            (y * imageData.width * 4) + x * 4,
-            (y * imageData.width * 4) + x * 4 + 1,
-            (y * imageData.width * 4) + x * 4 + 2
-        ]
+    getPixelColor: (ctx, x, y) ->
+        p = ctx.getImageData(x, y, 1, 1).data
 
-        return "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+        hsl = @cv.rgbToHsl(p[0], p[1], p[2]);
+        str = 'h:' + hsl[0] + ' s:' + hsl[1] + ' l:' + hsl[2];
+        return str
+        # return @cv.rgbToHex(p[0], p[1], p[2]);
 
     blend: () ->
-        width = @canvas.width;
-        height = @canvas.height;                
+        width = @canvas.width
+        height = @canvas.height                
         sourceData = @ctx.getImageData(0, 0, width, height);
 
         if typeof lastImageData is 'undefined' 
@@ -161,6 +160,111 @@ class BlobDetector
 
     copyPixels: (ctx, srcRect, destPt) ->
         ctx.putImageData srcRect, destPt.x, destPt.y
+
+    detect: (ctx) ->
+        minx = @canvas.width
+        miny = @canvas.height
+        maxx = maxy = 0
+        width = @canvas.width
+        height = @canvas.height
+
+        frame = @ctx.getImageData(0, 0, width, height)
+        map = []
+        
+        for i in [0..frame.data.length] by 4
+            r = frame.data[i + 0]
+            g = frame.data[i + 1]
+            b = frame.data[i + 2]
+
+            hsl = @cv.rgbToHsl r, g, b
+            h = hsl[0]
+            s = hsl[1]
+            l = hsl[2]
+            # pos = @cv.indexToXY frame, i
+            if (h >= 35 and h <= 50 and s >= 20 and s <= 80 and l >= 20 and l <= 80)
+                frame.data[i + 3] = 1
+                map.push 1
+                # if pos.x < minx then minx = pos.x 
+                # if pos.y < miny then miny = pos.y
+                # if pos.x > maxx then maxx = pos.x
+                # if pos.y > maxy then maxy = pos.y
+            else
+                map.push 0
+
+        console.log 'map', map.lengh
+        scores = @scoreMap map
+        spot = @targetScore scores
+        ctx.putImageData frame, 0, 0
+
+        return spot
+        # return {minx:minx, miny:miny, maxx:maxx, maxy:maxy}
+
+    scoreMap: (map) ->
+        width = @canvas.width
+        height = @canvas.height
+        scores = []
+        for j in [5..height-6]
+            for i in [5..width-6]
+                l5 = map[@cv.XYToIndex(width, i-5,j)/4]
+                l4 = map[@cv.XYToIndex(width, i-4,j)/4]
+                l3 = map[@cv.XYToIndex(width, i-3,j)/4]
+                l2 = map[@cv.XYToIndex(width, i-2,j)/4]
+                l1 = map[@cv.XYToIndex(width, i-1,j)/4]
+                r1 = map[@cv.XYToIndex(width, i+1,j)/4]
+                r2 = map[@cv.XYToIndex(width, i+2,j)/4]
+                r3 = map[@cv.XYToIndex(width, i+3,j)/4]
+                r4 = map[@cv.XYToIndex(width, i+4,j)/4]
+                r5 = map[@cv.XYToIndex(width, i+5,j)/4]
+                u5 = map[@cv.XYToIndex(width, i,j-5)/4]
+                u4 = map[@cv.XYToIndex(width, i,j-4)/4]
+                u3 = map[@cv.XYToIndex(width, i,j-3)/4]
+                u2 = map[@cv.XYToIndex(width, i,j-2)/4]
+                u1 = map[@cv.XYToIndex(width, i,j-1)/4]
+                d1 = map[@cv.XYToIndex(width, i,j+1)/4]
+                d2 = map[@cv.XYToIndex(width, i,j+2)/4]
+                d3 = map[@cv.XYToIndex(width, i,j+3)/4]
+                d4 = map[@cv.XYToIndex(width, i,j+4)/4]
+                d5 = map[@cv.XYToIndex(width, i,j+5)/4]
+                center = map[@cv.XYToIndex(width, i,j)/4]
+                # l5 = map[@cv.XYToIndex(width, i-5,j)/4]
+                # l4 = map[@cv.XYToIndex(width, i-4,j)/4]
+                # l3 = map[@cv.XYToIndex(width, i-3,j)/4]
+                # l2 = map[@cv.XYToIndex(width, i-2,j)/4]
+                # l1 = map[@cv.XYToIndex(width, i-1,j)/4]
+                # r1 = map[@cv.XYToIndex(width, i+1,j)/4]
+                # r2 = map[@cv.XYToIndex(width, i+2,j)/4]
+                # r3 = map[@cv.XYToIndex(width, i+3,j)/4]
+                # r4 = map[@cv.XYToIndex(width, i+4,j)/4]
+                # r5 = map[@cv.XYToIndex(width, i+5,j)/4]
+                # u5 = map[@cv.XYToIndex(width, i,j-5)/4]
+                # u4 = map[@cv.XYToIndex(width, i,j-4)/4]
+                # u3 = map[@cv.XYToIndex(width, i,j-3)/4]
+                # u2 = map[@cv.XYToIndex(width, i,j-2)/4]
+                # u1 = map[@cv.XYToIndex(width, i,j-1)/4]
+                # d1 = map[@cv.XYToIndex(width, i,j+1)/4]
+                # d2 = map[@cv.XYToIndex(width, i,j+2)/4]
+                # d3 = map[@cv.XYToIndex(width, i,j+3)/4]
+                # d4 = map[@cv.XYToIndex(width, i,j+4)/4]
+                # d5 = map[@cv.XYToIndex(width, i,j+5)/4]
+                # center = map[@cv.XYToIndex(width, i,j)/4]
+                
+              
+                scores.push l5+l4+l3+l2+l1+r1+r2+r3+r4+r5+u5+u4+u3+u2+u1+d1+d2+d3+d4+d5+center;
+        return scores
+
+    targetScore: (scores) ->
+        target = 0
+        width = @canvas.width
+        console.log scores.length
+        for i in [0..scores.length-1]            
+            if scores[i] > target
+                pos = i
+                target = scores[i]
+
+        return @cv.indexToXY width, pos*4
+
+
+        
 
 
 if typeof module isnt 'undefined' && module.exports
