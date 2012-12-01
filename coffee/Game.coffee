@@ -286,7 +286,7 @@ class Game
 
 
         #discover Technologies
-        if !@technologies[@TECH_FIRE] and @weather = WEATHER_RAIN and @DEATH_FROM_ICE >= 5
+        if !@technologies[@TECH_FIRE] and @weather = @WEATHER_RAIN and @DEATH_FROM_ICE >= 5
             discover @TECH_FIRE
 
         if !@technologies[@TECH_WHEEL]
