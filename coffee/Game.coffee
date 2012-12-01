@@ -94,7 +94,7 @@ class Game
         @build @BUILDING_TYPE_SAWMILL
 
         @priorities = [0,0,0,0,0]
-        @technologies = [false, false, false, false, false, false, false, false, false, false, false, false, ]
+        @technologies = [false, false, false, false, false, false, false, false, false, false, false, false]
 
         @interval = setInterval @myLoop, 100
 
@@ -111,14 +111,12 @@ class Game
         if @realInterval % 30 == 0
             @nextTurn()
 
-
         # Perform actions
         for people in @peoples
             people.walk()
             people.draw @ctxFront
 
         for building in @buildings
-            console.log 'Got a building'
             building.draw @ctxFront
 
         @realInterval += 1
@@ -141,21 +139,28 @@ class Game
         foodToAdd = 0
         woodToAdd = 0
         maxPeople = 5 #basic max of people
-        for buiding in @buildings
+        
+        for building in @buildings
             switch building.type
                 when @BUILDING_TYPE_TEMPLE
                     @resources[@MANA]++
+                
                 when @BUILDING_TYPE_FARM
                     foodToAdd += 4
+                
                 when @BUILDING_TYPE_PASTURE
                     foodToAdd += 6
+                
                 when @BUILDING_TYPE_HUNTING_LODGE
                     foodToAdd += 2
                     #depends of boats :)
+                
                 when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
+                
                 when @BUILDING_TYPE_GRANARY
                     foodCapacity += 20
+                
                 when @BUILDING_TYPE_HOUSE
                     maxPeople +=7
 
@@ -258,7 +263,6 @@ class Game
         #BUILDING_TYPE_HUNTING_LODGE = 6
         #BUILDING_TYPE_HARBOR = 7
 
-        
         switch type
             when @BUILDING_TYPE_TEMPLE
                 if @TEMPLE_COST > @resources[@WOOD] then return false
@@ -267,7 +271,7 @@ class Game
                 if pos[0] == -1 
                     pos = @findSlot "grass"
                     if pos[0] == -1 then return true #we don't build it, and we can't :(
-                building = new Building @BUILDING_TYPE_TEMPLE
+                building = new Building @BUILDING_TYPE_TEMPLE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -283,7 +287,7 @@ class Game
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 console.log "bvbbbbb"
-                building = new Building @BUILDING_TYPE_HUNTING_LODGE
+                building = new Building @BUILDING_TYPE_HUNTING_LODGE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -297,7 +301,7 @@ class Game
                 pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building @BUILDING_TYPE_PASTURE
+                building = new Building @BUILDING_TYPE_PASTURE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -310,7 +314,7 @@ class Game
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true
                 
-                building = new Building @BUILDING_TYPE_HOUSE
+                building = new Building @BUILDING_TYPE_HOUSE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -324,7 +328,7 @@ class Game
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building @BUILDING_TYPE_FARM
+                building = new Building @BUILDING_TYPE_FARM, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -336,7 +340,7 @@ class Game
                 if @GRANARY_COST > @resources[@WOOD] then return false
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building @BUILDING_TYPE_GRANARY
+                building = new Building @BUILDING_TYPE_GRANARY, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -350,7 +354,7 @@ class Game
                 if pos[0] == -1
                     pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building @BUILDING_TYPE_SAWMILL
+                building = new Building @BUILDING_TYPE_SAWMILL, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -366,12 +370,11 @@ class Game
     #type : string
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
-        console.log @map.tiles.widthMap + "*" + @map.tiles.heightMap
-        for i in [0..@map.tiles.widthMap]
-            for j in [0..@map.tiles.heightMap]
-                console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
+        for i in [0..@map.widthMap]
+            for j in [0..@map.heightMap]
+                # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
                 if @map.tiles[i][j].type == searchType #and @map.tiles[i][j].building
-                    console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
+                    # console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
                     return [i,j]
         return [-1,-1]
 

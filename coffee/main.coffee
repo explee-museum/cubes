@@ -20,9 +20,5 @@ $ ->
         canvasFront.width = document.width
         canvasFront.height = document.height
 
-
         game = new Game ctxFront, ctxBack, document.width, document.height
         game.init()
-
-
-

@@ -54,16 +54,17 @@ class Building
                     for j in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 14+j
 
+        # console.log @spriteElems
 
-    draw: (ctx, x, y) ->
+    draw: (ctx) ->
         x = @posX*50 + 2*10
         y = @posY*50 + 2*10
 
-        for i, elem in @spriteElems
-            if i <= 2
-                ctx.drawImage elem.spritesheet.image, 0, 0, 10, 10, x, y, 10, 10
-            else
-                ctx.drawImage elem.spritesheet.image, 0, 0, 10, 10, x, y, 10, 10
+        # console.log @spriteElems
+
+        for elem in @spriteElems
+            ctx.drawImage elem.spritesheet.image, 0, 0, 10, 10, x, y, 10, 10
+
 
     
 if typeof module isnt 'undefined' && module.exports
