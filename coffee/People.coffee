@@ -9,6 +9,7 @@ class People
         if @goal[0] < 0 
             return false
 
+        #to find a new destination
         if Math.abs(@goal[0] - @posX) < 3 and Math.abs(@goal[1] - @posY) < 3
             return false
 
@@ -28,7 +29,7 @@ class People
         return true
 
     findNewGoal: (x, y) ->
-        console.log "GOING TO " + x + "," + y
+        #console.log "GOING TO " + x + "," + y
         @goal = [x,y]
 
 
