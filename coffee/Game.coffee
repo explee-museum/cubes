@@ -1,6 +1,6 @@
 class Game
-    cconstructor: () ->
-        #MANA,FOOD,WOOD
+
+    constructor: (@ctxFront, @ctxBack, @width, @height) ->
         @resources = []
         @map = null
         @peoples = []
@@ -11,7 +11,6 @@ class Game
     
     nextTurn: () ->
         console.log "nextTurn"
-        sum = 0
         #food expanses
         sum = peoples.length*FOOD_COMSUPTION
         if  sum > ressources[FOOD]
