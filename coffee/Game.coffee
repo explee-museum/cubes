@@ -127,10 +127,10 @@ class Game
             @nextTurn()
             @addWeatherElements()
 
-        if @realInterval % 50 == 0
+        if @realInterval % 10 == 0
             document.getElementById('technos').innerHTML = ''
 
-        if @weatherDraw && @realInterval % 10 == 0
+        if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
             
             if @weather == @WEATHER_SNOW
@@ -138,9 +138,14 @@ class Game
                 @ctxWeather.fillStyle = 'white'
                 @ctxWeather.fillRect 0, 0, @width, @height
 
+            else if @weather == @WEATHER_RAIN
+                @ctxWeather.globalAlpha = 0.3
+                @ctxWeather.fillStyle = '#6088a4'
+                @ctxWeather.fillRect 0, 0, @width, @height
+
             for elem in @weatherElements
-                elem.posX += Math.round(Math.random() * 30)
-                elem.posY += 3
+                elem.posX += Math.round(Math.random() * 2)
+                elem.posY += 1
                 elem.draw @ctxWeather
 
 
@@ -183,11 +188,13 @@ class Game
         else if @weather == @WEATHER_WARM
             console.log 'warm'
 
+
+
         else if @weather == @WEATHER_RAIN
             @ctxWeather.globalAlpha = 0.2
 
-            r = Math.round(Math.random() * 3)
-            for i in [0..r]
+            r = Math.random()
+            if r > 0.75
                 cloud = new Cloud Math.round(Math.random()*@width/15) - 100, Math.round(Math.random()*@height)
                 @weatherElements.push cloud
 
@@ -206,6 +213,15 @@ class Game
 
         else if @weather == @WEATHER_WARM
             console.log 'warm'
+
+            @weatherElements = []
+            @ctxWeather.clearRect 0, 0, @width, @height
+
+            @ctxWeather.globalAlpha = 0.3
+            @ctxWeather.fillStyle = '#f0df44'
+            @ctxWeather.fillRect 0, 0, @width, @height
+
+            @weatherDraw = false
 
         else if @weather == @WEATHER_RAIN
             @weatherElements = []
