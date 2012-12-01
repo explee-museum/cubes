@@ -8,6 +8,9 @@ class Game
         @priorities = [] 
         @fps = 50
         
+        @interval = null
+        @realInterval = 0
+
         # Sprite for peoples
         @spritePeople = new Spritesheet 'img/spritePeople.png', 8
         @spritePeopleElements = [] 
@@ -16,33 +19,85 @@ class Game
         @spritePeopleElements.push new SpriteElement(@spritePeople, 2, 0)
         @spritePeopleElements.push new SpriteElement(@spritePeople, 3, 0)
     
+        @BUILDING_TYPE_TEMPLE = 0
+        @BUILDING_TYPE_HOUSE = 1
+        @BUILDING_TYPE_FARM = 2
+        @BUILDING_TYPE_GRANARY = 3
+        @BUILDING_TYPE_PASTURE = 4
+        @BUILDING_TYPE_SAWMILL = 5
+        @BUILDING_TYPE_HUNTING_LODGE = 6
+        @BUILDING_TYPE_HARBOR = 7
+
+        #BUILDING COSTS
+        @GRANARY_COST = 10
+        @TEMPLE_COST = 20
+        @HOUSE_COST = 5
+        @FARM_COST = 2
+        @HUNTING_LODGE_COST = 2
+        @PASTURE_COST = 3
+        @HARBOR_COST = 5
+
+        #DIVERS
+        @FOOD_COMSUPTION = 1
+
+        #PRIORITIES
+        @PRIORITY_IDDLE = 0
+        @PRIORITY_FOOD = 1
+        @PRIORITY_WOOD = 2
+        @PRIORITY_FAITH = 3
+        @PRIORITY_GRANARY = 4
+        @PRIORITY_HOUSE = 5
+
+
+        #TECH
+        @TECH_FIRE = 0
+        @TECH_BREEDING = 1
+        
+        @TECH_WHEEL = 3
+        @TECH_AGRICULTURE = 4
+
+        @TECH_PAPER = 6
+        @TECH_MAP = 7
+        @TECH_ARCHITECTURE = 8
+
+        @TECH_FISH = 10
+
+        #Ressources
+        @MANA = 0
+        @FOOD = 1
+        @WOOD = 2
+
+
     init: () ->
         # First, we initialize all the spritesheets
         @map = new Map(@width, @height)
         @map.init()
         @map.draw(@ctxBack)
 
-
         centerX = Math.round(@map.widthMap/2)
         centerY = Math.floor(@map.heightMap/2)
-        for i in [1..20]
+        for i in [1..200]
             r = Math.round(Math.random() * (@spritePeopleElements.length-1))
             people = new People centerX*50, centerY*50, @spritePeopleElements[r]
             people.draw(@ctxFront)
+            @peoples.push people
 
-    loop: () ->
-        # Perform actions
+        @interval = setInterval @myLoop, 1000
 
-        for people in peoples
-            people.draw @ctxFront
-
-
+    myLoop: () =>
         # Clear front canvas
         @ctxFront.clearRect 0, 0, @width, @height
+        
+        if @realInterval % 30 == 0
+            @nextTurn()
 
 
+        # Perform actions
+        for people in @peoples
+            people.walk()
+            people.draw @ctxFront
 
-
+        @realInterval += 1
 
 
 
