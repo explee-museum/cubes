@@ -5,22 +5,21 @@ class Game
         @peoples = []
         @buildings = []
         @technologies = []
+        @priorities = [] 
 
     
     nextTurn: () ->
         console.log "nextTurn"
-        sum = 0
-        #for people in peoples
+        #food expanses
+        sum = peoples.length*FOOD_COMSUPTION
+        if  sum > ressources[FOOD]
+            numberOfDeath = sum - ressources[FOOD]
+            ressources[FOOD] = 0
+            @priorities[PRIORITY_FOOD] = numberOfDeath * 2
+        else
+            @priorities[PRIORITY_FOOD] = - ressources[FOOD]
 
-
-
-        #for buiding in buildings
-        #    switch building.type
-        #        when 
-                    
-                
-            
-if typeof module isnt 'undefined' && module.exports
-    exports.Game = Game
-else 
-    window.Game = Game
+        #Earn buildings effects
+        for buiding in buildings
+            switch building.type
+                when 
