@@ -20,3 +20,7 @@ class Game
                     
                 
             
+if typeof module isnt 'undefined' && module.exports
+    exports.Game = Game
+else 
+    window.Game = Game

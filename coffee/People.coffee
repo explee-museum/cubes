@@ -12,3 +12,7 @@ class People
 
     draw: () ->
     
+if typeof module isnt 'undefined' && module.exports
+    exports.People = People
+else 
+    window.People = People
