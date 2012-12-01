@@ -4,7 +4,8 @@ $ ->
     # img.src = 'img/spriteGlobal.png'
     # img.onload = () ->
         # CONSTANTS
-
+        $('img').each (i, elem) ->
+            $(elem).hide()
         #BUILDING TYPES
         
         canvasFront = document.getElementById 'front'
@@ -26,7 +27,7 @@ $ ->
         canvasWeather.width = document.width
         canvasWeather.height = document.height
 
-        game = new Game ctxFront, ctxBack, document.width, document.height
+        game = new Game ctxFront, ctxBack, ctxWeather, document.width, document.height
         game.init()
 
         micVisible = false
@@ -39,11 +40,11 @@ $ ->
 
         document.getElementById('speech_result').onwebkitspeechchange = (val) ->
             switch val.target.value
-                when 'rain'
+                when 'rain', 'brain', 'wayne' 
                     game.weather = game.WEATHER_RAIN
                 when 'warm'
                     game.weather = game.WEATHER_WARM
-                when 'snow'
+                when 'snow', 'no', 'note', 'stove'
                     game.weather = game.WEATHER_SNOW
                 when 'sun'
                     game.weather = game.WEATHER_SUN

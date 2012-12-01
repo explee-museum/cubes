@@ -1,5 +1,5 @@
 class Game
-    constructor: (@ctxFront, @ctxBack, @width, @height) ->
+    constructor: (@ctxFront, @ctxBack, @ctxWeather, @width, @height) ->
         @resources = []
         @map = null
         @peoples = []
@@ -9,6 +9,8 @@ class Game
         @fps = 50
 
         @weather = 0
+        @weatherElements = []
+        @weatherDraw = false
         
         @interval = null
         @realInterval = 0
@@ -113,6 +115,21 @@ class Game
 
         if @realInterval % 30 == 0
             @nextTurn()
+            @addWeatherElements()
+
+        if @weatherDraw && @realInterval % 10 == 0
+            @ctxWeather.clearRect 0, 0, @width, @height
+            
+            if @weather == @WEATHER_SNOW
+                @ctxWeather.globalAlpha = 0.2
+                @ctxWeather.fillStyle = 'white'
+                @ctxWeather.fillRect 0, 0, @width, @height
+
+            for elem in @weatherElements
+                elem.posX += Math.round(Math.random() * 30)
+                elem.posY += 3
+                elem.draw @ctxWeather
+
 
         # Perform actions
         for people in @peoples
@@ -132,27 +149,57 @@ class Game
 
         return people
 
-    drawWeather: (ctx) ->
+    addWeatherElements: () ->
         if @weather == @WEATHER_SNOW
-            console.log 'snow'
+            r = Math.round(Math.random() * 5) 
+            for i in [0..r]
+                snow = new Snow Math.round(Math.random()*@width/10) - 200, Math.round(Math.random()*@height)
+                @weatherElements.push snow
+
+            @weatherDraw = true
 
         else if @weather == @WEATHER_WARM
             console.log 'warm'
 
         else if @weather == @WEATHER_RAIN
-            console.log 'rain'
-            img = new Image()
-            img.src = 'img/cloud.png'
+            @ctxWeather.globalAlpha = 0.2
 
-            ctx.globalAlpha = 0.2
-
-            r = Math.round(Math.random() * 10)
+            r = Math.round(Math.random() * 3)
             for i in [0..r]
-                ctx.drawImage img, Math.round(Math.random()*@width), Math.round(Math.random()*@height), 251, 188
+                cloud = new Cloud Math.round(Math.random()*@width/15) - 200, Math.round(Math.random()*@height)
+                @weatherElements.push cloud
+
+            @weatherDraw = true
+
+    drawWeather: () ->
+        if @weather == @WEATHER_SNOW
+            @weatherElements = []
+
+            r = Math.round(Math.random() * 10) + 40
+            for i in [0..r]
+                snow = new Snow Math.round(Math.random()*@width), Math.round(Math.random()*@height)
+                @weatherElements.push snow
+
+            @weatherDraw = true
+
+        else if @weather == @WEATHER_WARM
+            console.log 'warm'
+
+        else if @weather == @WEATHER_RAIN
+            @weatherElements = []
+            @ctxWeather.globalAlpha = 0.2
+
+            r = Math.round(Math.random() * 10) + 5
+            for i in [0..r]
+                cloud = new Cloud Math.round(Math.random()*@width), Math.round(Math.random()*@height)
+                @weatherElements.push cloud
+
+            @weatherDraw = true
+                
         else
             console.log 'else'
-            ctx.globalAlpha = 0
-            ctx.clearRect 0, 0, @width, @height
+            @ctxWeather.globalAlpha = 0
+            @ctxWeather.clearRect 0, 0, @width, @height
 
     nextTurn: () ->
         console.log "nextTurn"
