@@ -8,8 +8,11 @@ class Game
         @priorities = [] 
         @fps = 50
 
+
+
         @weather = 0
-        
+        @timeSameWeather = 0
+
         @interval = null
         @realInterval = 0
 
@@ -176,6 +179,9 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
 
+
+        oldWeather = @weather
+
         foodCapacity = 20
         woodCapacity = 5
 
@@ -339,6 +345,17 @@ class Game
                 if building.type == BUILDING_TYPE_TEMPLE then templeCount++
             discover @TECH_ARCHITECTURE
     
+
+        if oldWeather != @weather
+            @timeSameWeather = 0
+        else
+            @timeSameWeather++
+
+            #effects from time
+
+
+
+
 
     discover: (indexTechno) ->
         @technologies[indexTechno] = true
