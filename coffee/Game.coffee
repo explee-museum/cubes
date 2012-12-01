@@ -1,5 +1,5 @@
 class Game
-    constructor: () ->
+    constructor: (@ctxFront, @ctxBack, @width, @height) ->
         @resources = []
         @map = null
         @peoples = []
@@ -9,7 +9,7 @@ class Game
     
     nextTurn: () ->
         console.log "nextTurn"
-        var sum = 0;
+        sum = 0
         #for people in peoples
 
 
