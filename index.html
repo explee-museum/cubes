@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+    <head>    
+        <title>Cubes</title>        
+        <style type="text/css">
+            #webcam, #back {
+                display: none;
+                position: absolute;
+            }
+        </style>
+    </head>
+    <body>        
+        <div id="log">
+            Decoded frames: 0 Avg: 0<br>
+            Dropped frames: 0 Avg: 0<br>
+        </div>  
+        <div id="color"></div>
+        <video id="webcam" width="640" height="480"></video>
+        <canvas id="back" width="640" height="480"></canvas>
+        <canvas id="front" width="640" height="480"></canvas>
+        <script type="text/javascript" src="static/lib/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="js/BlobDetector.js"></script>
+        <script type="text/javascript" src="js/Cv.js"></script>
+        <script type="text/javascript" src="js/Stats.js"></script>
+        <script type="text/javascript">
+            //GetUserMedia
+            window.URL = window.URL || window.webkitURL;
+            navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+            var Stats = new Stats();
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia({audio: false, video: true}, function(stream) {
+                    Stats.startTest(window.URL.createObjectURL(stream));
+                }, function fail () {
+                    console.log('you fail');
+                });
+            }
+            window.requestAnimFrame = (function(){
+                return  window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function( callback ){
+                        window.setTimeout(canvasllback, 1000 / 60);
+                    };
+            })();
+
+            //Init
+            var video = document.querySelector('video');
+            var canvas = document.getElementById('front');
+            var ctx = canvas.getContext('2d');
+            var backCanvas = document.getElementById('back');
+            var backCtx = backCanvas.getContext('2d');
+
+            var BlobDetector = new BlobDetector(backCanvas);
+            var Cv = new Cv();
+
+            var mousex = mousey = 0;
+            var offset = $(front).offset();
+            $(front).mousemove(function(e){
+                mousex = Math.floor(e.pageX - offset.left);
+                mousey = Math.floor(e.pageY - offset.top);
+                document.getElementById('color').innerHTML = BlobDetector.getPixelColor(backCtx.getImageData(), mousex, mousey);
+            });
+
+            function drawFrame() {
+                ctx.drawImage(video, 0, 0, video.width, video.height);
+            }
+
+            function update() {
+                calculateStats();
+
+                // some freaky functions
+                yellowSquare();
+
+                requestAnimFrame(update);
+                drawFrame();
+            }
+
+        </script>
+    </body>
+</html>
