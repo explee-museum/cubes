@@ -24,7 +24,7 @@
             <script src="js/dd_belatedpng.js?v=1"></script>
           <![endif]--> 
   <style type="text/css">
-        #webcam, #back {
+        #webcam, #backVideo {
             display: none;
             position: absolute;
             top:40;
@@ -108,22 +108,20 @@
                 // var pixels = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
                 // var frame = Cv.convolute(pixels, weight, false);
                 // backCtx.putImageData(frame, 0, 0);
-                var rBounds = BlobDetector.detect(35, 50);
-                // var bBounds = BlobDetector.detect(185, 210);
+                // var rBounds = BlobDetector.detect(35, 50);
+                var bBounds = BlobDetector.detect(185, 210,ctx);
                 // var gBounds = BlobDetector.detect(90, 105);
 
-                frame = backCtx.getImageData(0, 0, canvas.width, canvas.height)
-                ctx.putImageData(frame, 0, 0);
+                // frame = backCtx.getImageData(0, 0, canvas.width, canvas.height)
+                // ctx.putImageData(frame, 0, 0);
 
-                //Draw result
-                ctx.save();
-                ctx.fillStyle = 'red';
-                ctx.fillRect(Math.floor(rBounds.x),Math.floor(rBounds.y), 5, 5);
-                // ctx.strokeStyle = 'blue';
-                // ctx.strokeRect(50 * Math.float(bBounds.x/50), 50 * Math.float(bBounds.y/50), 50, 50);
+                //Draw result                
+                // ctx.fillStyle = 'red';
+                // ctx.fillRect(Math.floor(rBounds.x),Math.floor(rBounds.y), 5, 5);
+                ctx.strokeStyle = 'blue';
+                ctx.fillRect(Math.floor(bBounds.x),Math.floor(bBounds.y), 5, 5);
                 // ctx.strokeStyle = 'green';
                 // ctx.strokeRect(gBounds.x, gBounds.y, 50, 50);
-                ctx.restore();
             }
         </script>
     </body>
