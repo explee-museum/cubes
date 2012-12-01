@@ -100,6 +100,9 @@ class Game
         
         document.getElementById('pop_count').innerHTML = @peoples.length
         document.getElementById('mana_count').innerHTML = @resources[0]
+        document.getElementById('food_count').innerHTML = @resources[1]
+        document.getElementById('wood_count').innerHTML = @resources[2]
+
 
         if @realInterval % 30 == 0
             @nextTurn()

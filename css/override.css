@@ -42,7 +42,25 @@ html, body {
     position: absolute;
     z-index: 11;
     left:50%;
-    margin-left: 52px;
+    margin-left: -21px;
     top:9px;
     font-size: 1.4em;
+}
+
+#pop #food_count {
+    position: absolute;
+    z-index: 11;
+    left:50%;
+    margin-left: 80px;
+    top:2px;
+    font-size: 1em;  
+}
+
+#pop #wood_count {
+    position: absolute;
+    z-index: 11;
+    left:50%;
+    margin-left: 80px;
+    top:20px;
+    font-size: 1em;  
 }
