@@ -18,7 +18,9 @@ class Game
         @spritePeopleElements.push new SpriteElement(@spritePeople, 1, 0)
         @spritePeopleElements.push new SpriteElement(@spritePeople, 2, 0)
         @spritePeopleElements.push new SpriteElement(@spritePeople, 3, 0)
-    
+
+        @spriteBuildings = new Spritesheet 'img/spriteBuildings.png', 10
+
         @BUILDING_TYPE_TEMPLE = 0
         @BUILDING_TYPE_HOUSE = 1
         @BUILDING_TYPE_FARM = 2
@@ -36,6 +38,7 @@ class Game
         @HUNTING_LODGE_COST = 2
         @PASTURE_COST = 3
         @HARBOR_COST = 5
+        @SAWMILL_COST = 3
 
         #DIVERS
         @FOOD_COMSUPTION = 1
@@ -89,10 +92,11 @@ class Game
         @build @BUILDING_TYPE_HOUSE
         @build @BUILDING_TYPE_HUNTING_LODGE
         @build @BUILDING_TYPE_HUNTING_LODGE
-        @build @BUILDING_TYPE_SAWMILL
+        @build @BUILDING_TYPE_SAWMILL 
+
 
         @priorities = [0,0,0,0,0]
-        @technologies = [false, false, false, false, false, false, false, false, false, false, false, false, ]
+        @technologies = [false, false, false, false, false, false, false, false, false, false, false, false]
 
         @interval = setInterval @myLoop, 100
 
@@ -109,11 +113,13 @@ class Game
         if @realInterval % 30 == 0
             @nextTurn()
 
-
         # Perform actions
         for people in @peoples
             people.walk()
             people.draw @ctxFront
+
+        for building in @buildings
+            building.draw @ctxFront
 
         @realInterval += 1
 
@@ -121,35 +127,48 @@ class Game
 
     nextTurn: () ->
         console.log "nextTurn"
+
+        foodCapacity = 20
+
+        for building in @buildings
+            if building.type == @BUILDING_TYPE_GRANARY
+                    foodCapacity += 20
+
         #food expanses
         sum = @peoples.length * @FOOD_COMSUPTION
         if  sum > @resources[@FOOD]
             numberOfDeath = sum - @resources[@FOOD]
             @resources[@FOOD] = 0
-            @priorities[@PRIORITY_FOOD] = numberOfDeath * 2
+            @priorities[@PRIORITY_FOOD] = numberOfDeath * 4
         else
-            @priorities[@PRIORITY_FOOD] = foodCapacity - @resources[@FOOD]
+            @priorities[@PRIORITY_FOOD] = (foodCapacity - @resources[@FOOD])*3
             @resources[@FOOD] -= sum
 
-        foodCapacity = 20 #basic food capacity
+         #basic food capacity
         foodToAdd = 0
         woodToAdd = 0
         maxPeople = 5 #basic max of people
-        for buiding in @buildings
+        
+        for building in @buildings
             switch building.type
                 when @BUILDING_TYPE_TEMPLE
                     @resources[@MANA]++
+                
                 when @BUILDING_TYPE_FARM
                     foodToAdd += 4
+                
                 when @BUILDING_TYPE_PASTURE
                     foodToAdd += 6
+                
                 when @BUILDING_TYPE_HUNTING_LODGE
                     foodToAdd += 2
                     #depends of boats :)
+                
                 when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
-                when @BUILDING_TYPE_GRANARY
-                    foodCapacity += 20
+                
+                
+                
                 when @BUILDING_TYPE_HOUSE
                     maxPeople +=7
 
@@ -182,7 +201,7 @@ class Game
             numberOfBorn = 0.125* Math.random()*@peoples.length
             #create 1/8 peoples size * random factor
         else
-            numberOfBorn = 0.250* Math.random()*@peoples.length
+            numberOfBorn = Math.random()*@peoples.length
             #create 1/4 peoples size * random factor
 
         bornCounter = Math.floor numberOfBorn
@@ -198,9 +217,9 @@ class Game
             console.log "in loop : k = " + k + "| priority = " + priority
             if priority > @priorities[maxIndex]
                 maxIndex = k
-        console.log "______________________________________________________________"
-        console.log "Want to build food : " + @priorities[@PRIORITY_FOOD]
-        console.log "PRIORITY : " + maxIndex + "| Value : " + @priorities[maxIndex]
+        #console.log "______________________________________________________________"
+        #console.log "Want to build food : " + @priorities[@PRIORITY_FOOD]
+        #console.log "PRIORITY : " + maxIndex + "| Value : " + @priorities[maxIndex]
         
 
         @commonSenseBuild maxIndex
@@ -231,7 +250,8 @@ class Game
                 else
                     @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
             when @PRIORITY_FOOD
-                if @build @BUILDING_TYPE_PASTURE or build @BUILDING_TYPE_FARM or build BUILDING_TYPE_HUNTING_LODGE
+                #if @build @BUILDING_TYPE_PASTURE or @build @BUILDING_TYPE_FARM or @build @BUILDING_TYPE_HUNTING_LODGE
+                if @build @BUILDING_TYPE_HUNTING_LODGE
                     @priorities[@PRIORITY_FOOD] = 0
 
                 else
@@ -252,7 +272,6 @@ class Game
         #BUILDING_TYPE_HUNTING_LODGE = 6
         #BUILDING_TYPE_HARBOR = 7
 
-        
         switch type
             when @BUILDING_TYPE_TEMPLE
                 if @TEMPLE_COST > @resources[@WOOD] then return false
@@ -261,7 +280,7 @@ class Game
                 if pos[0] == -1 
                     pos = @findSlot "grass"
                     if pos[0] == -1 then return true #we don't build it, and we can't :(
-                building = new Building @BUILDING_TYPE_TEMPLE
+                building = new Building @BUILDING_TYPE_TEMPLE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -270,20 +289,18 @@ class Game
                 return true
 
             when @BUILDING_TYPE_HUNTING_LODGE
-                console.log "I WANT TO BUILD HUNTING LODGE" + @HUNTING_LODGE_COST + ">" + @resources[@WOOD]
+                console.log "I WANT TO BUILD HUNTING LODGE :" + @HUNTING_LODGE_COST + " > " + @resources[@WOOD]
                 if @HUNTING_LODGE_COST > @resources[@WOOD] then return false
                 #create a new building
-                console.log "aaaaaa"
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
-                console.log "bvbbbbb"
-                building = new Building @BUILDING_TYPE_HUNTING_LODGE
+                building = new Building @BUILDING_TYPE_HUNTING_LODGE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @HUNTING_LODGE_COST
-                console.log "I WANT TO BUILD HUNTING LODGE, AND I SUCCESS"
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_PASTURE 
@@ -291,7 +308,7 @@ class Game
                 pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building @BUILDING_TYPE_PASTURE
+                building = new Building @BUILDING_TYPE_PASTURE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -300,16 +317,18 @@ class Game
                 return true
 
             when @BUILDING_TYPE_HOUSE 
+                console.log "I WANT TO BUILD HOUSE :" + @HOUSE_COST + " > " + @resources[@WOOD]
                 if @HOUSE_COST > @resources[@WOOD] then return false
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true
                 
-                building = new Building @BUILDING_TYPE_HOUSE
+                building = new Building @BUILDING_TYPE_HOUSE, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @HOUSE_COST
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_FARM
@@ -318,7 +337,7 @@ class Game
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building @BUILDING_TYPE_FARM
+                building = new Building @BUILDING_TYPE_FARM, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
@@ -327,29 +346,34 @@ class Game
                 return true
 
             when @BUILDING_TYPE_GRANARY 
+                console.log "I WANT TO BUILD GRANARY :" + @GRANARY_COST + " > " + @resources[@WOOD]
                 if @GRANARY_COST > @resources[@WOOD] then return false
                 pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building @BUILDING_TYPE_GRANARY
+                building = new Building @BUILDING_TYPE_GRANARY, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @GRANARY_COST
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_SAWMILL 
+                console.log "I WANT TO BUILD SAWMILL :" + @SAWMILL_COST + " > " + @resources[@WOOD]
                 if @SAWMILL_COST > @resources[@WOOD] then return false
                 pos = @findSlot "mountain"
                 if pos[0] == -1
                     pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building @BUILDING_TYPE_SAWMILL
+                building = new Building @BUILDING_TYPE_SAWMILL, @spriteBuildings
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
                 @resources[@WOOD] -= @SAWMILL_COST
+
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
             when @BUILDING_TYPE_HARBOR
@@ -360,11 +384,12 @@ class Game
     #type : string
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
-        for i in [0..@map.tiles.widthMap]
-            for j in [0..@map.tiles.heightMap]
-                #console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
+
+        for i in [0..@map.widthMap]
+            for j in [0..@map.heightMap]
+                # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
                 if @map.tiles[i][j].type == searchType and @map.tiles[i][j].building == null
-                    #console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
+                    # console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
                     return [i,j]
         return [-1,-1]
 
