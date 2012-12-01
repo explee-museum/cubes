@@ -13,6 +13,9 @@ $ ->
         canvasBack = document.getElementById 'back'
         ctxBack = canvasBack.getContext '2d'
 
+        canvasWeather = document.getElementById 'weather'
+        ctxWeather = canvasBack.getContext '2d'
+
         # initialize size
         canvasBack.width = document.width
         canvasBack.height = document.height
@@ -22,3 +25,26 @@ $ ->
 
         game = new Game ctxFront, ctxBack, document.width, document.height
         game.init()
+
+        micVisible = false
+        $('#mic').click () ->
+            if not micVisible
+                $(this).animate({
+                    'margin-right': -20
+                    }, 300)
+                micVisible = true
+
+        document.getElementById('speech_result').onwebkitspeechchange = (val) ->
+            switch val.target.value
+                when 'rain'
+                    game.weather = game.WEATHER_RAIN
+                when 'warm'
+                    game.weather = game.WEATHER_WARM
+                when 'snow'
+                    game.weather = game.WEATHER_SNOW
+                when 'sun'
+                    game.weather = game.WEATHER_SUN
+                else
+                    game.weather = game.WEATHER_SUN
+            
+            game.weatherHasChanged = true

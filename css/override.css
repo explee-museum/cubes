@@ -18,6 +18,12 @@ html, body {
     /*background: green;*/
 }
 
+#weather {
+    position: absolute;
+    z-index: 2;
+    overflow: hidden; 
+}
+
 #pop {
     position: absolute;
     top:-2px;
@@ -63,4 +69,16 @@ html, body {
     margin-left: 80px;
     top:20px;
     font-size: 1em;  
+}
+
+#mic {
+    background: url(../img/mic.png) no-repeat 0px 0px;
+    position: absolute;
+    right:0px;
+    top: 10%;
+    width: 300px;
+    height: 70px;
+    z-index:10;
+    cursor: pointer;
+    margin-right: -230px;
 }

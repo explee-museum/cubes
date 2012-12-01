@@ -7,6 +7,8 @@ class Game
         @technologies = []
         @priorities = [] 
         @fps = 50
+
+        @weather = 0
         
         @interval = null
         @realInterval = 0
@@ -20,6 +22,11 @@ class Game
         @spritePeopleElements.push new SpriteElement(@spritePeople, 3, 0)
 
         @spriteBuildings = new Spritesheet 'img/spriteBuildings.png', 10
+
+        @WEATHER_SUN = 0
+        @WEATHER_RAIN = 1
+        @WEATHER_WARM = 2
+        @WEATHER_SNOW = 3
 
         @BUILDING_TYPE_TEMPLE = 0
         @BUILDING_TYPE_HOUSE = 1
@@ -125,6 +132,20 @@ class Game
         @peoples.push people
 
         return people
+
+    drawWeather: (ctx) ->
+        if @weather == @WEATHER_SUN
+            console.log 'sun'
+            ctx.clearRect 0, 0, @width, @height
+
+        else if @weather == @WEATHER_SNOW
+            console.log 'snow'
+
+        else if @weather == @WEATHER_WARM
+            console.log 'warm'
+
+        else if @weather == @WEATHER_RAIN
+            console.log 'rain'
 
     nextTurn: () ->
         console.log "nextTurn"
