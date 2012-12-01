@@ -128,7 +128,7 @@ class Game
             @resources[@FOOD] = 0
             @priorities[@PRIORITY_FOOD] = numberOfDeath * 2
         else
-            @priorities[@PRIORITY_FOOD] = - @resources[@FOOD]
+            @priorities[@PRIORITY_FOOD] = foodCapacity - @resources[@FOOD]
             @resources[@FOOD] -= sum
 
         foodCapacity = 20 #basic food capacity
@@ -266,7 +266,7 @@ class Game
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
                 @buildings.push building
-                @resources[WOOD] -= @TEMPLE_COST
+                @resources[@WOOD] -= @TEMPLE_COST
                 return true
 
             when @BUILDING_TYPE_HUNTING_LODGE
@@ -360,12 +360,11 @@ class Game
     #type : string
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
-        console.log @map.tiles.widthMap + "*" + @map.tiles.heightMap
         for i in [0..@map.tiles.widthMap]
             for j in [0..@map.tiles.heightMap]
-                console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
-                if @map.tiles[i][j].type == searchType #and @map.tiles[i][j].building
-                    console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
+                #console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
+                if @map.tiles[i][j].type == searchType and @map.tiles[i][j].building == null
+                    #console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
                     return [i,j]
         return [-1,-1]
 
