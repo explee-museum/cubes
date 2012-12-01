@@ -62,7 +62,7 @@ class Game
 
         @TECH_FISH = 10
 
-        #Ressources
+        #resources
         @MANA = 0
         @FOOD = 1
         @WOOD = 2
@@ -74,6 +74,9 @@ class Game
         @map.init()
         @map.draw(@ctxBack)
 
+
+        @resources = [400,200,0]
+
         centerX = Math.round(@map.widthMap/2)
         centerY = Math.floor(@map.heightMap/2)
         for i in [1..200]
@@ -82,7 +85,14 @@ class Game
             people.draw(@ctxFront)
             @peoples.push people
 
-        @interval = setInterval @myLoop, 1000
+        #Then we start with 1 House, 1 hunting lodge, and 1 sawmill
+        @build @BUILDING_TYPE_HOUSE
+        @build @BUILDING_TYPE_HUNTING_LODGE
+        @build @BUILDING_TYPE_SAWMILL
+
+
+
+        @interval = setInterval @myLoop, 100
 
     myLoop: () =>
         # Clear front canvas
@@ -104,49 +114,55 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
         #food expanses
-        sum = @peoples.length * FOOD_COMSUPTION
-        if  sum > @ressources[FOOD]
-            numberOfDeath = sum - @ressources[FOOD]
-            @ressources[FOOD] = 0
-            @priorities[PRIORITY_FOOD] = numberOfDeath * 2
+        sum = @peoples.length * @FOOD_COMSUPTION
+        if  sum > @resources[@FOOD]
+            numberOfDeath = sum - @resources[@FOOD]
+            @resources[@FOOD] = 0
+            @priorities[@PRIORITY_FOOD] = numberOfDeath * 2
         else
-            @priorities[PRIORITY_FOOD] = - @ressources[FOOD]
+            @priorities[@PRIORITY_FOOD] = - @resources[@FOOD]
 
         foodCapacity = 20 #basic food capacity
+        foodToAdd = 0
+        woodToAdd = 0
         maxPeople = 5 #basic max of people
         for buiding in @buildings
             switch building.type
-                when BUILDING_TYPE_TEMPLE
-                    @ressources[MANA]++
-                when BUILDING_TYPE_FARM
+                when @BUILDING_TYPE_TEMPLE
+                    @resources[@MANA]++
+                when @BUILDING_TYPE_FARM
                     foodToAdd += 4
-                when BUILDING_TYPE_PASTURE
+                when @BUILDING_TYPE_PASTURE
                     foodToAdd += 6
-                when BUILDING_TYPE_HUNTING_LODGE
+                when @BUILDING_TYPE_HUNTING_LODGE
                     foodToAdd += 2
                     #depends of boats :)
-                when BUILDING_TYPE_SAWMILL
+                when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
-                when BUILDING_TYPE_GRANARY
+                when @BUILDING_TYPE_GRANARY
                     foodCapacity += 20
-                when BUILDING_TYPE_HOUSE
+                when @BUILDING_TYPE_HOUSE
                     maxPeople +=7
 
-        if @ressources[FOOD]+foodToAdd > foodCapacity
+        if @resources[@FOOD]+foodToAdd > foodCapacity
             #Our peoples need more granary!
-            @priorities[PRIORITY_GRANARY] = @ressources[FOOD]+foodToAdd - foodCapacity
-            foodToAdd = foodCapacity - @ressources[FOOD] 
+            @priorities[@PRIORITY_GRANARY] = @resources[@FOOD]+foodToAdd - foodCapacity
+            foodToAdd = foodCapacity - @resources[@FOOD] 
 
-        @ressources[FOOD] += foodToAdd
-        @ressources[WOOD] += woodToAdd
+        @resources[@FOOD] += foodToAdd
+        @resources[@WOOD] += woodToAdd
         
         #Calculate if we need to build more temples
         
+
+        console.log "We are "+@peoples.length
+        console.log "They gonna die : "+numberOfDeath
+
         #kill peoples
         killCounter = numberOfDeath
         while killCounter > 0
            killCounter--
-           deadIndex = Math.floor Math.random()*@peoples.length
+           deadIndex = Math.floor(Math.random()*@peoples.length)
            @peoples.splice deadIndex,deadIndex
 
 
@@ -163,7 +179,8 @@ class Game
         bornCounter = Math.floor numberOfBorn
         while bornCounter > 0
             bornCounter--
-            @peoples.push(new People)
+            p = new People Math.round(@map.widthMap/2)*50, Math.round(@map.heightMap/2)*50, @spritePeopleElements[0]
+            @peoples.push(p)
             
 
         #build buildings! (only 1 per turn)
@@ -172,7 +189,7 @@ class Game
             if priority > @priorities[maxIndex]
                 maxIndex = k
         
-        commonSenseBuild maxIndex
+        @commonSenseBuild maxIndex
         
 
     commonSenseBuild: (maxIndex) ->
@@ -184,28 +201,28 @@ class Game
         switch maxIndex
             #when PRIORITY_IDDLE
 
-            when PRIORITY_GRANARY
-                if build BUILDING_TYPE_GRANARY
-                    @priorities[PRIORITY_GRANARY] = 0
+            when @PRIORITY_GRANARY
+                if build @BUILDING_TYPE_GRANARY
+                    @priorities[@PRIORITY_GRANARY] = 0
                 else
-                    @priorities[PRIORITY_WOOD] += GRANARY_COST
-            when PRIORITY_WOOD
-                if build BUILDING_TYPE_SAWMILL
-                    @priorities[PRIORITY_WOOD] = 0
+                    @priorities[@PRIORITY_WOOD] += @GRANARY_COST
+            when @PRIORITY_WOOD
+                if build @BUILDING_TYPE_SAWMILL
+                    @priorities[@PRIORITY_WOOD] = 0
                 else
-                    @priorities[PRIORITY_WOOD] += SAWMILL_COST
-            when PRIORITY_FAITH
-                if build BUILDING_TYPE_TEMPLE
-                    @priorities[PRIORITY_FAITH] = 0
+                    @priorities[@PRIORITY_WOOD] += @SAWMILL_COST
+            when @PRIORITY_FAITH
+                if build @BUILDING_TYPE_TEMPLE
+                    @priorities[@PRIORITY_FAITH] = 0
                 else
-                    @priorities[PRIORITY_WOOD] += TEMPLE_COST
-            when PRIORITY_FOOD
-                if build BUILDING_TYPE_PASTURE or build BUILDING_TYPE_FARM or build BUILDING_TYPE_HUNTING_LODGE
-                    @priorities[PRIORITY_FOOD] = 0
+                    @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
+            when @PRIORITY_FOOD
+                if build @BUILDING_TYPE_PASTURE or build @BUILDING_TYPE_FARM or build BUILDING_TYPE_HUNTING_LODGE
+                    @priorities[@PRIORITY_FOOD] = 0
 
                 else
                     #we majorate by the strongest cost
-                    @priorities[PRIORITY_WOOD] += PASTURE_COST
+                    @priorities[@PRIORITY_WOOD] += @PASTURE_COST
 
 
     #Waiting for a integer : building type
@@ -222,95 +239,102 @@ class Game
 
         
         switch type
-            when BUILDING_TYPE_TEMPLE
-                if TEMPLE_COST > @ressources[WOOD] then return false
+            when @BUILDING_TYPE_TEMPLE
+                if @TEMPLE_COST > @resources[@WOOD] then return false
                 #find a slot for the building
-                pos = findSlot "sand"
+                pos = @findSlot "sand"
                 if pos[0] == -1 
-                    pos = findSlot "grass"
+                    pos = @findSlot "grass"
                     if pos[0] == -1 then return true #we don't build it, and we can't :(
-                building = new Building BUILDING_TYPE_TEMPLE
+                building = new Building @BUILDING_TYPE_TEMPLE
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= TEMPLE_COST
+                @buildings.push building
+                @resources[WOOD] -= @TEMPLE_COST
                 return true
 
-            when BUILDING_TYPE_HUNTING_LODGE
-                if HUNTING_LODGE_COST > @ressources[WOOD] then return false
+            when @BUILDING_TYPE_HUNTING_LODGE
+                if @HUNTING_LODGE_COST > @resources[@WOOD] then return false
                 #create a new building
-                pos = findSlot "grass"
+                pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
-                building = new Building BUILDING_TYPE_HUNTING_LODGE
+                building = new Building @BUILDING_TYPE_HUNTING_LODGE
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= HUNTING_LODGE_COST
+                @buildings.push building
+                @resources[@WOOD] -= @HUNTING_LODGE_COST
                 return true
 
-            when BUILDING_TYPE_PASTURE 
-                if PASTURE_COST > @ressources[WOOD] or !@technologies[TECH_BREEDING] then return false
-                pos = findSlot "mountain"
+            when @BUILDING_TYPE_PASTURE 
+                if @PASTURE_COST > @resources[@WOOD] or !@technologies[TECH_BREEDING] then return false
+                pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building BUILDING_TYPE_PASTURE
+                building = new Building @BUILDING_TYPE_PASTURE
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= PASTURE_COST
+                @buildings.push building
+                @resources[@WOOD] -= @PASTURE_COST
                 return true
 
-            when BUILDING_TYPE_HOUSE 
-                if HOUSE_COST > @ressources[WOOD] then return false
-                pos = findSlot "grass"
+            when @BUILDING_TYPE_HOUSE 
+                if @HOUSE_COST > @resources[@WOOD] then return false
+                pos = @findSlot "grass"
                 if pos[0] == -1 then return true
                 
-                building = new Building BUILDING_TYPE_HOUSE
+                building = new Building @BUILDING_TYPE_HOUSE
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= HOUSE_COST
+                @buildings.push building
+                @resources[@WOOD] -= @HOUSE_COST
                 return true
 
-            when BUILDING_TYPE_FARM
-                if FARM_COST > @ressources[WOOD] or !@technologies[TECH_AGRICULTURE] then return false
+            when @BUILDING_TYPE_FARM
+                if @FARM_COST > @resources[@WOOD] or !@technologies[@TECH_AGRICULTURE] then return false
                 #create a new building
-                pos = findSlot "grass"
+                pos = @findSlot "grass"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
-                building = new Building BUILDING_TYPE_FARM
+                building = new Building @BUILDING_TYPE_FARM
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= FARM_COST
+                @buildings.push building
+                @resources[@WOOD] -= @FARM_COST
                 return true
 
-            when BUILDING_TYPE_GRANARY 
-                if GRANARY_COST > @ressources[WOOD] then return false
-                pos = findSlot "grass"
+            when @BUILDING_TYPE_GRANARY 
+                if @GRANARY_COST > @resources[@WOOD] then return false
+                pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building BUILDING_TYPE_GRANARY
+                building = new Building @BUILDING_TYPE_GRANARY
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= GRANARY_COST
+                @buildings.push building
+                @resources[@WOOD] -= @GRANARY_COST
                 return true
 
-            when BUILDING_TYPE_SAWMILL 
-                if SAWMILL_COST > @ressources[WOOD] then return false
-                pos = findSlot "mountain"
+            when @BUILDING_TYPE_SAWMILL 
+                if @SAWMILL_COST > @resources[@WOOD] then return false
+                pos = @findSlot "mountain"
                 if pos[0] == -1
-                    pos = findSlot "grass"
+                    pos = @findSlot "grass"
                 if pos[0] == -1 then return true 
-                building = new Building BUILDING_TYPE_SAWMILL
+                building = new Building @BUILDING_TYPE_SAWMILL
                 building.posX = pos[0]
                 building.posY = pos[1]
                 @map.tiles[pos[0]][pos[1]].building = building
-                @ressources[WOOD] -= SAWMILL_COST
+                @buildings.push building
+                @resources[@WOOD] -= @SAWMILL_COST
                 return true
 
-            when BUILDING_TYPE_HARBOR
-                if HARBOR_COST > @ressources[WOOD] or !@technologies[TECH_FISH] then return false
+            when @BUILDING_TYPE_HARBOR
+                if @HARBOR_COST > @resources[@WOOD] or !@technologies[@TECH_FISH] then return false
                 #create a new building
                 return true
 
