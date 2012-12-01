@@ -77,16 +77,10 @@ class Game
         @map.init()
         @map.draw(@ctxBack)
 
-
         @resources = [10,10,200]
 
-        centerX = Math.round(@map.widthMap/2)
-        centerY = Math.floor(@map.heightMap/2)
         for i in [1..10]
-            r = Math.round(Math.random() * (@spritePeopleElements.length-1))
-            people = new People centerX*50, centerY*50, @spritePeopleElements[r]
-            people.draw(@ctxFront)
-            @peoples.push people
+            @addPeople()
 
         #Then we start with 1 House, 2 hunting lodge, and 1 sawmill
         @build @BUILDING_TYPE_HOUSE
@@ -119,11 +113,17 @@ class Game
             people.draw @ctxFront
 
         for building in @buildings
-            building.draw @ctxFront
+            building.draw @ctxBack
 
         @realInterval += 1
 
+    addPeople: () ->
+        r = Math.round(Math.random() * (@spritePeopleElements.length-1))
+        people = new People Math.round(@map.widthMap/2)*50, Math.round(@map.heightMap/2)*50, @spritePeopleElements[r]
+        people.draw(@ctxFront)
+        @peoples.push people
 
+        return people
 
     nextTurn: () ->
         console.log "nextTurn"
@@ -141,7 +141,7 @@ class Game
             @resources[@FOOD] = 0
             @priorities[@PRIORITY_FOOD] = numberOfDeath * 4
         else
-            @priorities[@PRIORITY_FOOD] = (foodCapacity - @resources[@FOOD])*3
+            @priorities[@PRIORITY_FOOD] = foodCapacity - @resources[@FOOD]
             @resources[@FOOD] -= sum
 
          #basic food capacity
@@ -207,9 +207,10 @@ class Game
         bornCounter = Math.floor numberOfBorn
         while bornCounter > 0
             bornCounter--
-            p = new People Math.round(@map.widthMap/2)*50, Math.round(@map.heightMap/2)*50, @spritePeopleElements[0]
-            @peoples.push(p)
-            
+            if maxPeople == @peoples.length
+                @priorities[@PRIORITY_HOUSE]++
+            else
+                @addPeople()            
 
         #build buildings! (only 1 per turn)
         maxIndex = 0

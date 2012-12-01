@@ -10,7 +10,7 @@ class People
         @posY += Math.floor(Math.random() * 5) - 2
 
     draw: (ctx) ->
-        ctx.drawImage @spriteElement.spritesheet.image, 0, 0, 8, 8, @posX, @posY, 8, 8
+        ctx.drawImage @spriteElement.spritesheet.image, @spriteElement.i*10, @spriteElement.j*10, 8, 8, @posX, @posY, 8, 8
     
 if typeof module isnt 'undefined' && module.exports
     exports.People = People
