@@ -137,11 +137,7 @@ class Game
         return people
 
     drawWeather: (ctx) ->
-        if @weather == @WEATHER_SUN
-            console.log 'sun'
-            ctx.clearRect 0, 0, @width, @height
-
-        else if @weather == @WEATHER_SNOW
+        if @weather == @WEATHER_SNOW
             console.log 'snow'
 
         else if @weather == @WEATHER_WARM
@@ -149,6 +145,18 @@ class Game
 
         else if @weather == @WEATHER_RAIN
             console.log 'rain'
+            img = new Image()
+            img.src = 'img/cloud.png'
+
+            ctx.globalAlpha = 0.2
+
+            r = Math.round(Math.random() * 10)
+            for i in [0..r]
+                ctx.drawImage img, Math.round(Math.random()*@width), Math.round(Math.random()*@height), 251, 188
+        else
+            console.log 'else'
+            ctx.globalAlpha = 0
+            ctx.clearRect 0, 0, @width, @height
 
     nextTurn: () ->
         console.log "nextTurn"

@@ -8,19 +8,19 @@ html, body {
 #front {
     overflow: hidden;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
 }
 
 #back {
     position: absolute;
-    z-index: 0;
+    z-index: 1;
     overflow: hidden;
     /*background: green;*/
 }
 
 #weather {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     overflow: hidden; 
 }
 
@@ -81,4 +81,9 @@ html, body {
     z-index:10;
     cursor: pointer;
     margin-right: -230px;
+}
+
+#mic input {
+    margin-top: 23px;
+    margin-left: 70px;
 }
