@@ -4,7 +4,16 @@ html, body {
 
     overflow: hidden;
 }
-#game {
-    border:1px black solid;
+
+#front {
     overflow: hidden;
+    position: absolute;
+    z-index: 1;
+}
+
+#back {
+    position: absolute;
+    z-index: 2;
+    overflow: hidden;
+    /*background: green;*/
 }

@@ -6,8 +6,22 @@ class Game
         @buildings = []
         @technologies = []
         @priorities = [] 
-
+        @fps = 50
+        
     
+    init: () ->
+        # First, we initialize all the spritesheets
+
+        @map = new Map(@width, @height)
+        @map.init()
+
+        @map.draw(@ctxBack)
+
+
+
+    loop: () ->
+
+
     nextTurn: () ->
         console.log "nextTurn"
         #food expanses
@@ -20,6 +34,14 @@ class Game
             @priorities[PRIORITY_FOOD] = - ressources[FOOD]
 
         #Earn buildings effects
-        for buiding in buildings
-            switch building.type
-                when 
+        # for buiding in buildings
+        #     switch building.type
+        #         when 
+
+
+
+
+if typeof module isnt 'undefined' && module.exports
+    exports.Game = Game
+else 
+    window.Game = Game

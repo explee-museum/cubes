@@ -1,5 +1,5 @@
 class SpriteElement
-    constructor: (@spriteSheet, @i, @j) ->
+    constructor: (@spritesheet, @i, @j) ->
     
 
 if typeof module isnt 'undefined' && module.exports
