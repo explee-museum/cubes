@@ -10,13 +10,13 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
         var sum = 0;
-        for people in peoples
-            
+        #for people in peoples
 
 
-        for buiding in buildings
-            switch building.type
-                when 
+
+        #for buiding in buildings
+        #    switch building.type
+        #        when 
                     
                 
             
