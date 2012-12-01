@@ -120,7 +120,16 @@ class Game
 
         # Perform actions
         for people in @peoples
-            people.walk()
+            if !people.walk()
+                #we have to find him a new goal!
+                j = Math.round (Math.random() * @map.heightMap)
+                i = Math.round (Math.random() * @map.widthMap)
+                while (@map.tiles[i][j].type == "water")
+                    j = Math.round (Math.random() * @map.heightMap)
+                    i = Math.round (Math.random() * @map.widthMap)
+
+                people.findNewGoal i*50,j*50
+
             people.draw @ctxFront
 
         for building in @buildings
