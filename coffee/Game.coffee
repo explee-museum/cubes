@@ -18,7 +18,9 @@ class Game
         @spritePeopleElements.push new SpriteElement(@spritePeople, 1, 0)
         @spritePeopleElements.push new SpriteElement(@spritePeople, 2, 0)
         @spritePeopleElements.push new SpriteElement(@spritePeople, 3, 0)
-    
+
+        @spriteBuildings = new Spritesheet 'img/spriteBuildings.png', 10
+
         @BUILDING_TYPE_TEMPLE = 0
         @BUILDING_TYPE_HOUSE = 1
         @BUILDING_TYPE_FARM = 2
@@ -112,6 +114,10 @@ class Game
         for people in @peoples
             people.walk()
             people.draw @ctxFront
+
+        for building in @buildings
+            console.log 'Got a building'
+            building.draw @ctxFront
 
         @realInterval += 1
 
