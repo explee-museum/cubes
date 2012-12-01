@@ -166,7 +166,7 @@ class Game
         while killCounter > 0
            killCounter--
            deadIndex = Math.floor(Math.random()*@peoples.length)
-           @peoples.splice deadIndex,deadIndex
+           @peoples.splice deadIndex, 1
 
 
 
