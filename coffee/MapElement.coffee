@@ -14,6 +14,7 @@ class MapElement
 
         @size =  size / spritesheetGlobal.offset
         @building = null
+        @res = 50
         @init()
 
     init: () ->

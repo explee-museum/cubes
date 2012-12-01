@@ -230,11 +230,12 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
 
-
+        @resources[@MANA]++
         oldWeather = @weather
 
         foodCapacity = 20
         woodCapacity = 5
+        numberOfDeath = 0
 
         for building in @buildings
             if building.type == @BUILDING_TYPE_GRANARY
@@ -258,6 +259,9 @@ class Game
         maxPeople = 5 #basic max of people
         
         for building in @buildings
+            if @map.tiles[building.posX][building.posY].res <= 0 
+                    continue
+            @map.tiles[building.posX][building.posY].res--
             switch building.type
                 when @BUILDING_TYPE_TEMPLE
                     @resources[@MANA]++
@@ -377,7 +381,7 @@ class Game
             for i in [0..@map.widthMap]
                 for j in [0..@map.heightMap]
                     if @map.tiles[i][j].type == "mountain" then mountainCount++
-            if mountainCount > 4 then discover @TECH_WHEEL
+            if mountainCount > 2 then discover @TECH_WHEEL
 
         if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
             @discover @TECH_AGRICULTURE
@@ -520,7 +524,6 @@ class Game
                 console.log "I WANT TO BUILD PASTURE :" + @PASTURE_COST + " > " + @resources[@WOOD]
                 if !@technologies[@TECH_BREEDING]  or @PASTURE_COST > @resources[@WOOD] then return false
                 
-                console.log "dafaq"
                 pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 
