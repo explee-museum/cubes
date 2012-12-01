@@ -29,16 +29,16 @@ class Stats
             @startTime = currentTime
 
             # Calculate decoded frames per sec.
-            fps = (video.webkitDecodedFrameCount - decodedFrames) / deltaTime
+            fps = (video.webkitDecodedFrameCount - @decodedFrames) / deltaTime
             @decodedFrames = video.webkitDecodedFrameCount
             @decodedFPS = fps
 
             # Calculate dropped frames per sec.
-            fps = (video.webkitDroppedFrameCount - droppedFrames) / deltaTime
+            fps = (video.webkitDroppedFrameCount - @droppedFrames) / deltaTime
             @droppedFrames = video.webkitDroppedFrameCount
             @droppedFPS = fps
 
-            logDiv.innerHTML = "Decoded frames: " + decodedFrames + " Avg: " + decodedFPS + " fps.<br>" + "Dropped frames: " + droppedFrames + " Avg: " + droppedFPS + " fps.<br>"
+            logDiv.innerHTML = "Decoded frames: " + @decodedFrames + " Avg: " + @decodedFPS + " fps.<br>" + "Dropped frames: " + @droppedFrames + " Avg: " + @droppedFPS + " fps.<br>"
 
     endTest: (successFlag) -> 
         # Notify PyAuto that we've completed the test run.
