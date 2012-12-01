@@ -15,43 +15,43 @@ class Building
 
         switch @type
             when BUILDING_TYPE_TEMPLE
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, j
 
             when BUILDING_TYPE_HOUSE
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 2+j
 
             when BUILDING_TYPE_GRANARY
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 4+j
 
             when BUILDING_TYPE_FARM
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 6+j
 
             when BUILDING_TYPE_PASTURE
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 8+j
 
             when BUILDING_TYPE_SAWMILL
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 10+j
 
             when BUILDING_TYPE_HUNTING_LODGE
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 12+j
 
             when BUILDING_TYPE_HARBOR
-                for i in [0..1]
-                    for j in [0..1]
+                for j in [0..1]
+                    for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 14+j
 
         # console.log @spriteElems
@@ -61,9 +61,10 @@ class Building
         y = @posY*50 + 2*10
 
         # console.log @spriteElems
-
-        for elem in @spriteElems
-            ctx.drawImage elem.spritesheet.image, 0, 0, 10, 10, x, y, 10, 10
+        ctx.drawImage @spriteElems[0].spritesheet.image, @spriteElems[0].i*10, @spriteElems[0].j*10, 10, 10, x, y, 10, 10
+        ctx.drawImage @spriteElems[1].spritesheet.image, @spriteElems[1].i*10, @spriteElems[1].j*10, 10, 10, x+10, y, 10, 10
+        ctx.drawImage @spriteElems[2].spritesheet.image, @spriteElems[2].i*10, @spriteElems[2].j*10, 10, 10, x, y+10, 10, 10
+        ctx.drawImage @spriteElems[3].spritesheet.image, @spriteElems[3].i*10, @spriteElems[3].j*10, 10, 10, x+10, y+10, 10, 10
 
 
     
