@@ -50,6 +50,8 @@ class Game
         #DIVERS
         @FOOD_COMSUPTION = 1
         @MAX_AGE = 50
+        @DEATH_FROM_ICE = 0
+
 
         #PRIORITIES
         @PRIORITY_IDDLE = 0
@@ -58,6 +60,7 @@ class Game
         @PRIORITY_FAITH = 3
         @PRIORITY_GRANARY = 4
         @PRIORITY_HOUSE = 5
+
 
 
         #TECH
@@ -191,10 +194,11 @@ class Game
                 when @BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
                 
-                
-                
                 when @BUILDING_TYPE_HOUSE
-                    maxPeople +=7
+                    if @technologies[@TECH_ARCHITECTURE]
+                        maxPeople += 10
+                    else
+                        maxPeople += 7
 
         if @resources[@FOOD]+foodToAdd > foodCapacity
             #Our peoples need more granary!
@@ -258,13 +262,55 @@ class Game
 
         @commonSenseBuild maxIndex
 
+        if @weather == @WEATHER_SNOW
+            coldDie = Math.random() * 10 < 2
+            if coldDie
+                if @technologies[@TECH_FIRE]
+                    killCounter = 1/10 * @peoples.length
+                else
+                    killCounter = 1/3 * @peoples.length
+                while killCounter > 0
+                    killCounter--
+                    deadIndex = Math.floor(Math.random()*@peoples.length)
+                    @DEATH_FROM_ICE++
+                    @peoples.splice deadIndex, 1
+
 
 
         #discover Technologies
-        #if !@technologies[@TECH_FIRE]
+        if !@technologies[@TECH_FIRE] and @weather = WEATHER_RAIN and @DEATH_FROM_ICE >= 5
+            discover @TECH_FIRE
+
+        if !@technologies[@TECH_WHEEL]
+            mountainCount = 0
+            for i in [0..@map.widthMap]
+                for j in [0..@map.heightMap]
+                    if @map.tiles[i][j].type == "mountain" then mountainCount++
+            if mountainCount > 4 then discover @TECH_WHEEL
+
+        if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
+            discover @TECH_AGRICULTURE
+
+        if !@technologies[@TECH_BREEDING] and @technologies[@TECH_FIRE]
+            hunterCount = 0
+            for building in @buildings
+                if building.type == BUILDING_TYPE_HUNTING_LODGE then hunterCount++
+            if hunterCount > 5
+                discover @TECH_BREEDING
+
+        if !@technologies[@TECH_PAPER] and @technologies[@TECH_FIRE] and @peoples.length > 100
+            discover @TECH_PAPER
 
 
-        
+        if !@technologies[@TECH_ARCHITECTURE] and @technologies[@TECH_PAPER] and @peoples.length > 200
+            templeCount = 0
+            for building in @buildings
+                if building.type == BUILDING_TYPE_TEMPLE then templeCount++
+            discover @TECH_ARCHITECTURE
+    
+
+    discover: (indexTechno) ->
+        @technologies[indexTechno] = true
 
     commonSenseBuild: (maxIndex) ->
         #PRIORITY_IDDLE = 0
