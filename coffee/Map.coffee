@@ -10,7 +10,7 @@ class Map
     
 
     init: () ->
-        centerX = Math.round(@widthMap/2)
+        centerX = Math.round(@widthMap/2)-2
         centerY = Math.floor(@heightMap/2)
 
         for i in [0..@widthMap]

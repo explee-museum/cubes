@@ -76,14 +76,29 @@ html, body {
     position: absolute;
     right:0px;
     top: 10%;
-    width: 300px;
+    width: 74px;
     height: 70px;
     z-index:10;
     cursor: pointer;
-    margin-right: -230px;
 }
 
 #mic input {
-    margin-top: 23px;
-    margin-left: 70px;
+    -webkit-transform: scale(4,3);
+    opacity: 0.01;
+    width: 11px;
+    margin-left: 22px;
+    margin-top: 25px;
+}
+
+#technos {
+    position: absolute;
+    top:60px;
+    left:50%;
+    margin-left: -200px;
+    height:20px;
+    width:400px;
+    z-index: 11;
+    font-size: 2.3em;
+    text-align: center;
+    color: white;
 }
