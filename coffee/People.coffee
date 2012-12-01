@@ -6,6 +6,8 @@ class People
         @age = 0
 
     walk: () ->
+        @poxX += Math.floor Math.random * 4 -2
+        @poxY += Math.floor Math.random * 4 -2
 
     draw: (ctx) ->
         ctx.drawImage @spriteElement.spritesheet.image, 0, 0, 8, 8, @posX, @posY, 8, 8
