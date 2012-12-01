@@ -42,7 +42,8 @@
             window.URL = window.URL || window.webkitURL;
             navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-            var Stats = new Stats();
+            var video = document.querySelector('video');
+            var Stats = new Stats(video);
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({audio: false, video: true}, function(stream) {
                     Stats.startTest(window.URL.createObjectURL(stream));
@@ -57,7 +58,6 @@
             })();
 
             //Init
-            var video = document.querySelector('video');
             var canvas = document.getElementById('front');
             var ctx = canvas.getContext('2d');
             var backCanvas = document.getElementById('back');
@@ -79,7 +79,7 @@
             }
 
             function update() {
-                calculateStats();
+                Stats.calculate();
 
                 // some freaky functions
                 yellowSquare();

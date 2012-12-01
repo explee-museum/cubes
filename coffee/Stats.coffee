@@ -18,7 +18,7 @@ class Stats
             @endTest(true)
         , false
 
-    calculate = (logDiv) ->
+    calculate: (logDiv) ->
         if @video.readyState <= HTMLMediaElement.HAVE_CURRENT_DATA || @video.paused || @video.ended
             return
 
@@ -40,12 +40,12 @@ class Stats
 
             logDiv.innerHTML = "Decoded frames: " + decodedFrames + " Avg: " + decodedFPS + " fps.<br>" + "Dropped frames: " + droppedFrames + " Avg: " + droppedFPS + " fps.<br>"
 
-    endTest = (successFlag) -> 
+    endTest: (successFlag) -> 
         # Notify PyAuto that we've completed the test run.
         if window.domAutomationController
             window.domAutomationController.send(successFlag)
 
-    startTest = (url) ->
+    startTest: (url) ->
         @video.src = url
         @video.play()
 
