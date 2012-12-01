@@ -1,6 +1,5 @@
 class Game
-    cconstructor: () ->
-        #MANA,FOOD,WOOD
+    constructor: (@ctxFront, @ctxBack, @width, @height) ->
         @resources = []
         @map = null
         @peoples = []
@@ -11,7 +10,6 @@ class Game
     
     nextTurn: () ->
         console.log "nextTurn"
-        sum = 0
         #food expanses
         sum = @peoples.length * FOOD_COMSUPTION
         if  sum > ressources[FOOD]
@@ -34,7 +32,6 @@ class Game
                     foodToAdd += 6
                 when BUILDING_TYPE_HUNTING_LODGE
                     foodToAdd += 2
-                #when BUILDING_TYPE_HARBOR
                     #depends of boats :)
                 when BUILDING_TYPE_SAWMILL
                     woodToAdd += 4
@@ -61,10 +58,14 @@ class Game
            @peoples.splice deadIndex,deadIndex
 
 
+
+
         #create peoples
         if numberOfDeath > 0
+
         #    numberOfBorn = 0.125*Math.floor Math.random()*
             
+
             #create 1/4 peoples size * random factor
         else
             #create 1/2 peoples size * random factor
@@ -88,6 +89,7 @@ class Game
         #PRIORITY_GRANARY = 4
         switch maxIndex
             #when PRIORITY_IDDLE
+
             when PRIORITY_GRANARY
                 if build BUILDING_TYPE_GRANARY
                     @priorities[PRIORITY_GRANARY] = 0
@@ -106,10 +108,10 @@ class Game
             when PRIORITY_FOOD
                 if build BUILDING_TYPE_PASTURE or build BUILDING_TYPE_FARM or build BUILDING_TYPE_HUNTING_LODGE
                     @priorities[PRIORITY_FOOD] = 0
+
                 else
                     #we majorate by the strongest cost
                     @priorities[PRIORITY_WOOD] += PASTURE_COST
-
 
 
     #We can only build on empty cases
@@ -122,6 +124,7 @@ class Game
         #BUILDING_TYPE_SAWMILL = 5
         #BUILDING_TYPE_HUNTING_LODGE = 6
         #BUILDING_TYPE_HARBOR = 7
+
         
         switch type
             when BUILDING_TYPE_TEMPLE
@@ -161,8 +164,19 @@ class Game
 
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (type) ->
-        #for 
-            
 
-
+        if noSlotsLeft then return false
+        switch type
+            when BUILDING_TYPE_TEMPLE
+                if TEMPLE_COST > @ressources[WOOD] then return false
+                #create a new building
+                return true
+            when BUILDING_TYPE_HUNTING_LODGE
+                if GRANARY_COST > @ressources[WOOD] then return false
+                #create a new building
+                return true
+            when BUILDING_TYPE_PASTURE 
+                if GRANARY_COST > @ressources[WOOD] or !@technologies[TECH_BREEDING] then return false
+                #create a new building
+                return true
 
