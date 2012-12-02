@@ -175,10 +175,11 @@ class Game
 
 
         for boat in @boats
+            mx = Math.floor(boat.posX/50 +0.5)
+            my = Math.floor(boat.posY/50 +0.5)
+            if @map.tiles[mx][my].type == "water" and !boat.navigate()
 
-            if @map.tiles[Math.round((boat.posX)+10/50)][Math.round((boat.posY)+10/50)].type == "water" and !boat.navigate()
-
-                if @technologies[@MAP]
+                if @technologies[@TECH_MAP]
 
                     j = boat.srcY+Math.round (Math.random() * 5 -2)
                     i = boat.srcX+Math.round (Math.random() * 5 -2)
@@ -395,8 +396,9 @@ class Game
         peoplesToDel = []
         for people in @peoples
             #check if they are in water
-            if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
-                people.isDead = true;
+            #if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
+            #    console.log "YIHAA, ON WATER"
+            #    people.isDead = true;
             #remove dead people
             if people.isDead
                 people.timeDead++
@@ -594,8 +596,8 @@ class Game
             if building.type == @BUILDING_TYPE_HARBOR
                 harborList.push(building)
         if harborList.length > 0
-            i = Math.round(Math.random() * harborList.length)
-            building = harborList[i]
+            indn = Math.round(Math.random() * harborList.length)
+            building = harborList[indn]
             @boats.push(new Boat building.posX*50, building.posY*50)
 
 
