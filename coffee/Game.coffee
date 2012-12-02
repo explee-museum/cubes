@@ -138,14 +138,6 @@ class Game
             @nextTurn()
             @addWeatherElements()
 
-            for t in @technologies
-                if t
-                    @score += 2
-
-            @score += @peoples.length
-
-            document.getElementById('score').innerHTML = @score
-
         # if @realInterval % 50 == 0
             # document.getElementById('technos').innerHTML = ''
 
