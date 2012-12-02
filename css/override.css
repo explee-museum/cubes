@@ -140,6 +140,52 @@ html, body {
     z-index: 3   
 }
 
+#score {
+    position: absolute;
+    width: 700px;
+    height: 400px;
+    margin-left: -350px;
+    margin-top: -200px;
+    top: 50%;
+    left:50%;
+    background: rgb(54, 25, 25);
+    background: rgba(54, 25, 25, .65);
+    z-index: 110;
+    display: none;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 3px #5d4d2b solid;
+}
+
+#score img {
+    position: absolute;
+    left: 50%;
+    margin-left: -80px;
+    top: 180px;
+}
+
+i {
+    font-style: italic;
+}
+
+b {
+    color: #f04428;
+}
+
+#points {
+    font-size: 2em;
+    text-align: center;
+    color:white;
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 6em;
+    color: white;
+    text-align: center;
+}
+
 #c {
     position: absolute;
     top:0px;

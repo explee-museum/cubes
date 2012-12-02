@@ -21,7 +21,7 @@ class Game
         @realInterval = 0
 
         @score = 1
-        @scoreTechno = 1
+        @maxPop = 0
 
         # Sprite for peoples
         @spritePeople = new Spritesheet 'img/spritePeople.png', 8
@@ -140,6 +140,20 @@ class Game
         # if @realInterval % 50 == 0
             # document.getElementById('technos').innerHTML = ''
 
+
+        # Check for end of the game
+        if @alivePeople < 1
+            clearInterval @interval
+            
+            scoreTech = 1
+            for tech in @technologies
+                if tech
+                    scoreTech *= 5
+
+            @score = scoreTech + @maxPop*4 + @buildings.length*10 + @boats.length*2
+            document.getElementById('count').innerHTML = @score
+
+
         if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
             
@@ -244,7 +258,7 @@ class Game
             @ctxWeather.globalAlpha = 0.2
 
             r = Math.random()
-            if r > 0.75
+            if r > 0.55
                 cloud = new Cloud Math.round(Math.random()*@width/15) - 100, Math.round(Math.random()*@height)
                 @weatherElements.push cloud
 

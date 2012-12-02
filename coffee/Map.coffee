@@ -16,7 +16,7 @@ class Map
         for i in [0..@widthMap]
             tempArray = []
             for j in [0..@heightMap]
-                if i in [centerX-6..centerX+6] && j in [centerY-4..centerY+4]
+                if i in [centerX-3..centerX+3] && j in [centerY-1..centerY+1]
                     r = Math.random()
                     if r <= 0.05
                         mapElement = new MapElement 'mountain', @spritesheet, @sizeCase

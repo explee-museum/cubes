@@ -4,8 +4,7 @@ $ ->
     # img.src = 'img/spriteGlobal.png'
     # img.onload = () ->
         # CONSTANTS
-        $('img').each (i, elem) ->
-            $(elem).hide()
+        $('#loading').hide()
 
         #BUILDING TYPES
         canvasFront = document.getElementById 'front'
@@ -91,4 +90,9 @@ $ ->
 
         document.getElementById('technos').addEventListener('DOMSubtreeModified', () ->
             $('#technos').show().fadeOut 3000
+        ,false)
+
+        document.getElementById('count').addEventListener('DOMSubtreeModified', () ->
+            $('#score').show().fadeIn 400
+
         ,false)
