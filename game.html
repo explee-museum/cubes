@@ -38,7 +38,11 @@
         <canvas id="frontVideoDebug" width="320" height="240"></canvas>
 
         <div id="technos"></div>
-        <div id="score"></div>
+        <div id="score">
+            <img src="img/loose.png">
+            <div id="message">YOU LOST!</div>
+            <div id="points"><i>with an awesome highscore</i><br/> <b id="count">25678 points</b>.</div>
+        </div>
 
         <canvas id="back" width="640" height="480"></canvas>
         <canvas id="front" width="640" height="480"></canvas>
@@ -48,11 +52,13 @@
             <input type="text" id="speech_result" x-webkit-speech />
         </div>        
 
-        <img src="img/spriteGlobal.png" >
-        <img src="img/spritePeople.png" >
-        <img src="img/spriteBuildings.png" >
-        <img src="img/cloud.png" >
-        <img src="img/boat.png" >
+        <div id="loading">
+            <img src="img/spriteGlobal.png" >
+            <img src="img/spritePeople.png" >
+            <img src="img/spriteBuildings.png" >
+            <img src="img/cloud.png" >
+            <img src="img/boat.png" >
+        </div>
         
         <script src="js/main.js"></script>
         <script src="js/WeatherElement.js"></script>
