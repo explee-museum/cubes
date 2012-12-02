@@ -21,7 +21,7 @@ class Game
         @realInterval = 0
 
         @score = 1
-        @scoreTechno = 1
+        @maxPop = 0
 
         # Sprite for peoples
         @spritePeople = new Spritesheet 'img/spritePeople.png', 8
@@ -140,6 +140,20 @@ class Game
         # if @realInterval % 50 == 0
             # document.getElementById('technos').innerHTML = ''
 
+
+        # Check for end of the game
+        if @alivePeople < 1
+            clearInterval @interval
+            
+            scoreTech = 1
+            for tech in @technologies
+                if tech
+                    scoreTech *= 5
+
+            @score = scoreTech + @maxPop*4 + @buildings.length*10 + @boats.length*2
+            document.getElementById('count').innerHTML = @score
+
+
         if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
             
@@ -175,10 +189,11 @@ class Game
 
 
         for boat in @boats
+            mx = Math.floor(boat.posX/50 +0.5)
+            my = Math.floor(boat.posY/50 +0.5)
+            if @map.tiles[mx][my].type == "water" and !boat.navigate()
 
-            if @map.tiles[Math.round((boat.posX)+10/50)][Math.round((boat.posY)+10/50)].type == "water" and !boat.navigate()
-
-                if @technologies[@MAP]
+                if @technologies[@TECH_MAP]
 
                     j = boat.srcY+Math.round (Math.random() * 5 -2)
                     i = boat.srcX+Math.round (Math.random() * 5 -2)
@@ -244,7 +259,7 @@ class Game
             @ctxWeather.globalAlpha = 0.2
 
             r = Math.random()
-            if r > 0.75
+            if r > 0.55
                 cloud = new Cloud Math.round(Math.random()*@width/15) - 100, Math.round(Math.random()*@height)
                 @weatherElements.push cloud
 
@@ -395,8 +410,9 @@ class Game
         peoplesToDel = []
         for people in @peoples
             #check if they are in water
-            if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
-                people.isDead = true;
+            #if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
+            #    console.log "YIHAA, ON WATER"
+            #    people.isDead = true;
             #remove dead people
             if people.isDead
                 people.timeDead++
@@ -594,8 +610,8 @@ class Game
             if building.type == @BUILDING_TYPE_HARBOR
                 harborList.push(building)
         if harborList.length > 0
-            i = Math.round(Math.random() * harborList.length)
-            building = harborList[i]
+            indn = Math.round(Math.random() * harborList.length)
+            building = harborList[indn]
             @boats.push(new Boat building.posX*50, building.posY*50)
 
 
