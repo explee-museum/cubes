@@ -8,10 +8,14 @@ class Game
         @priorities = [] 
         @fps = 50
 
+
+
         @weather = 0
+        @timeSameWeather = 0
+
         @weatherElements = []
         @weatherDraw = false
-        
+
         @interval = null
         @realInterval = 0
 
@@ -127,10 +131,10 @@ class Game
             @nextTurn()
             @addWeatherElements()
 
-        if @realInterval % 50 == 0
+        if @realInterval % 10 == 0
             document.getElementById('technos').innerHTML = ''
 
-        if @weatherDraw && @realInterval % 10 == 0
+        if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
             
             if @weather == @WEATHER_SNOW
@@ -138,9 +142,14 @@ class Game
                 @ctxWeather.fillStyle = 'white'
                 @ctxWeather.fillRect 0, 0, @width, @height
 
+            else if @weather == @WEATHER_RAIN
+                @ctxWeather.globalAlpha = 0.3
+                @ctxWeather.fillStyle = '#6088a4'
+                @ctxWeather.fillRect 0, 0, @width, @height
+
             for elem in @weatherElements
-                elem.posX += Math.round(Math.random() * 30)
-                elem.posY += 3
+                elem.posX += Math.round(Math.random() * 2)
+                elem.posY += 1
                 elem.draw @ctxWeather
 
 
@@ -183,11 +192,13 @@ class Game
         else if @weather == @WEATHER_WARM
             console.log 'warm'
 
+
+
         else if @weather == @WEATHER_RAIN
             @ctxWeather.globalAlpha = 0.2
 
-            r = Math.round(Math.random() * 3)
-            for i in [0..r]
+            r = Math.random()
+            if r > 0.75
                 cloud = new Cloud Math.round(Math.random()*@width/15) - 100, Math.round(Math.random()*@height)
                 @weatherElements.push cloud
 
@@ -206,6 +217,15 @@ class Game
 
         else if @weather == @WEATHER_WARM
             console.log 'warm'
+
+            @weatherElements = []
+            @ctxWeather.clearRect 0, 0, @width, @height
+
+            @ctxWeather.globalAlpha = 0.3
+            @ctxWeather.fillStyle = '#f0df44'
+            @ctxWeather.fillRect 0, 0, @width, @height
+
+            @weatherDraw = false
 
         else if @weather == @WEATHER_RAIN
             @weatherElements = []
@@ -226,8 +246,12 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
 
+        @resources[@MANA]++
+        oldWeather = @weather
+
         foodCapacity = 20
         woodCapacity = 5
+        numberOfDeath = 0
 
         for building in @buildings
             if building.type == @BUILDING_TYPE_GRANARY
@@ -251,6 +275,9 @@ class Game
         maxPeople = 5 #basic max of people
         
         for building in @buildings
+            if @map.tiles[building.posX][building.posY].res <= 0 
+                    continue
+            @map.tiles[building.posX][building.posY].res--
             switch building.type
                 when @BUILDING_TYPE_TEMPLE
                     @resources[@MANA]++
@@ -370,7 +397,7 @@ class Game
             for i in [0..@map.widthMap]
                 for j in [0..@map.heightMap]
                     if @map.tiles[i][j].type == "mountain" then mountainCount++
-            if mountainCount > 4 then discover @TECH_WHEEL
+            if mountainCount > 2 then discover @TECH_WHEEL
 
         if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
             @discover @TECH_AGRICULTURE
@@ -392,6 +419,17 @@ class Game
                 if building.type == @BUILDING_TYPE_TEMPLE then templeCount++
             @discover @TECH_ARCHITECTURE
     
+
+        if oldWeather != @weather
+            @timeSameWeather = 0
+        else
+            @timeSameWeather++
+
+            #effects from time
+
+
+
+
 
     discover: (indexTechno) ->
         @technologies[indexTechno] = true
@@ -502,7 +540,6 @@ class Game
                 console.log "I WANT TO BUILD PASTURE :" + @PASTURE_COST + " > " + @resources[@WOOD]
                 if !@technologies[@TECH_BREEDING]  or @PASTURE_COST > @resources[@WOOD] then return false
                 
-                console.log "dafaq"
                 pos = @findSlot "mountain"
                 if pos[0] == -1 then return true #we don't build it, and we can't :(
                 

@@ -48,7 +48,7 @@ $ ->
             switch val.target.value
                 when 'rain', 'brain', 'wayne' 
                     game.weather = game.WEATHER_RAIN
-                when 'warm'
+                when 'warm', 'test'
                     game.weather = game.WEATHER_WARM
                 when 'snow', 'no', 'note', 'stove'
                     game.weather = game.WEATHER_SNOW
@@ -58,3 +58,7 @@ $ ->
                     game.weather = game.WEATHER_SUN
             
             game.drawWeather ctxWeather
+
+        $('canvas').click (event) ->
+            console.log event.pageX
+            console.log event.pageY

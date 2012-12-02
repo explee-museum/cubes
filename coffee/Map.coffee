@@ -33,7 +33,8 @@ class Map
     randomMap: () ->
         console.log 'randomize'
         
-
+    addMapElement: (type, i, j) ->
+        @tiles[i][j] = new MapElement type, @spritesheet, @sizeCase
 
     draw: (ctx) ->
         console.log 'drawing...'
