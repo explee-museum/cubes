@@ -177,20 +177,20 @@ class Game
                 #we have to find him a new goal!
 
                 if @technologies[@MAP]
-                    j = boat.srcX+Math.round (Math.random() * 5 -2)
-                    i = boat.srcY+Math.round (Math.random() * 5 -2)
+                    j = boat.srcY+Math.round (Math.random() * 5 -2)
+                    i = boat.srcX+Math.round (Math.random() * 5 -2)
                     while (i>0 and j>0 and i< @map.widthMap and j < @map.heightMap and @map.tiles[i][j].type != "water")
-                        j = boat.srcX+Math.round (Math.random() * 5 -2)
-                        i = boat.srcY+Math.round (Math.random() * 5 -2)
+                        j = boat.srcY+Math.round (Math.random() * 5 -2)
+                        i = boat.srcX+Math.round (Math.random() * 5 -2)
 
                     boat.findNewGoal i*50+10, j*50+10
                 else
 
-                    j = boat.srcX+Math.round (Math.random() * 3 -1)
-                    i = boat.srcY+Math.round (Math.random() * 3 -1)
+                    j = boat.srcY+Math.round (Math.random() * 3 -1)
+                    i = boat.srcX+Math.round (Math.random() * 3 -1)
                     while (i>0 and j>0 and i< @map.widthMap and j < @map.heightMap and @map.tiles[i][j].type != "water")
-                        j = boat.srcX+Math.round (Math.random() * 3 -1)
-                        i = boat.srcY+Math.round (Math.random() * 3 -1)
+                        j = boat.srcY+Math.round (Math.random() * 3 -1)
+                        i = boat.srcX+Math.round (Math.random() * 3 -1)
 
                     boat.findNewGoal i*50+10, j*50+10
 
@@ -526,7 +526,7 @@ class Game
                 else
                     @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
             when @PRIORITY_FOOD
-                if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR > 0 and @resources[@WOOD] > @BOAT_COST
+                if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR > 0 and @resources[@WOOD] > @BOAT_COST and @boats.length < 5
                     @buildABoat()
                     @priorities[@PRIORITY_FOOD] = 0
                 else if @build(@BUILDING_TYPE_PASTURE) or @build(@BUILDING_TYPE_FARM) or @build(@BUILDING_TYPE_HUNTING_LODGE)

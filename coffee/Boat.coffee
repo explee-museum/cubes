@@ -26,8 +26,8 @@ class Boat
         if @posY < @goal[1]
             dirY = 1
 
-        @posX += dirX
-        @posY += dirY
+        @posX += dirX*0.5
+        @posY += dirY*0.5
         return true
 
     findNewGoal: (x, y) ->
