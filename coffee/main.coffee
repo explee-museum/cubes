@@ -13,6 +13,7 @@ $ ->
 
         canvasBack = document.getElementById 'back'
         ctxBack = canvasBack.getContext '2d'
+        window.ctxBack = ctxBack
 
         canvasDebug = document.getElementById 'frontDebug'
         ctxDebug = canvasBack.getContext '2d'
@@ -34,7 +35,9 @@ $ ->
         canvasWeather.height = document.height
 
         game = new Game ctxFront, ctxBack, ctxWeather, document.width, document.height
-        game.init()
+        game.init()        
+
+        window.game = game
 
         # micVisible = false
         # $('#mic').click () ->

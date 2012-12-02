@@ -197,7 +197,11 @@ class BlobDetector
         width = @canvas.width
         height = @canvas.height
 
+        @ctx.save()
+        @ctx.translate(width, 0);
+        @ctx.scale(-1, 1);
         frame = @ctx.getImageData(0, 0, width, height)
+        @ctx.restore()
         data = frame.data
         len = frame.data.length-4
         map = []        
