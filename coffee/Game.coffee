@@ -101,9 +101,9 @@ class Game
 
     init: () ->
         # First, we initialize all the spritesheets
-        @map = new Map(@width, @height)
+        @map = new Map(@ctxBack, @width, @height)
         @map.init()
-        @map.draw(@ctxBack)
+        @map.draw()
 
         @resources = [10,10,50]
 
@@ -130,9 +130,6 @@ class Game
         document.getElementById('mana_count').innerHTML = @resources[0]
         document.getElementById('food_count').innerHTML = @resources[1]
         document.getElementById('wood_count').innerHTML = @resources[2]
-
-
-
 
         if @realInterval % 30 == 0
             @nextTurn()

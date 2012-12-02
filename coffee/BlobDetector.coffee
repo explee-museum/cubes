@@ -188,7 +188,7 @@ class BlobDetector
     copyPixels: (ctx, srcRect, destPt) ->
         ctx.putImageData srcRect, destPt.x, destPt.y
 
-    detect: (hmin, hmax, ctx) ->
+    detect: (ctx) ->
         # startTime = new Date().getTime()
 
         minx = @canvas.width
@@ -197,25 +197,88 @@ class BlobDetector
         width = @canvas.width
         height = @canvas.height
 
+        # threshold
+        redhmin = 320
+        redhmax = 360
+        redweight = 0
+        redmap = []
+        # rose
+        rhmin = 35
+        rhmax = 50
+        rweight = 0
+        rmap = []
+        # blue
+        bhmin = 185
+        bhmax = 210
+        bweight = 0
+        bmap = []
+        # green
+        ghmin = 90
+        ghmax = 105
+        gweight = 0
+        gmap = []
+
         @ctx.save()
-        @ctx.translate(width, 0);
-        @ctx.scale(-1, 1);
+        # @ctx.translate(width, 0);
+        # @ctx.scale(-1, 1);
         frame = @ctx.getImageData(0, 0, width, height)
-        @ctx.restore()
+        @ctx.restore()  
         data = frame.data
-        len = frame.data.length-4
-        map = []        
+        len = frame.data.length-4        
         
         for i in [0..len] by 4
             hsl = @cv.rgbToHsl data[i + 0], data[i + 1], data[i + 2]
             h = hsl[0]
             s = hsl[1]
             l = hsl[2]
-            if h >= hmin and h <= hmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
-                data[i+3] = 0
-                map.push 1                
+            if h >= rhmin and h <= rhmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
+                # data[i+3] = 0
+                rmap.push 1  
+                rweight++              
             else
-                map.push 0
+                rmap.push 0
+            if h >= bhmin and h <= bhmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
+                # data[i+3] = 0
+                bmap.push 1  
+                bweight++              
+            else
+                bmap.push 0
+            if h >= ghmin and h <= ghmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
+                # data[i+3] = 0
+                gmap.push 1  
+                gweight++              
+            else
+                gmap.push 0
+
+            if h >= redhmin and h <= redhmax and s >= 20 and s <= 90 and l >= 20 and l <= 90
+                # data[i+3] = 0
+                redmap.push 1  
+                redweight++              
+            else
+                redmap.push 0
+
+        if redweight > rweight and redweight > gweight and redweight > bweight
+            type = 'mountain'
+            map = redmap
+        else
+            if rweight > bweight 
+                if rweight > gweight
+                    type = 'sand'
+                    map = rmap
+                else
+                    if gweight > bweight
+                        type = 'grass'
+                        map = gmap
+                    else
+                        type = 'water'
+                        map = bmap
+            else 
+                if gweight > bweight
+                    type = 'grass'
+                    map = gmap
+                else
+                    type = 'water'
+                    map = bmap
 
         # output = @ctx.createImageData width, height
         # dst = output.data
@@ -238,7 +301,7 @@ class BlobDetector
         # stopTime = new Date().getTime()
         # console.log 'timer detect', stopTime - startTime
 
-        return spot
+        return {type: type, bounds:spot}
         # return {minx:minx, miny:miny, maxx:maxx, maxy:maxy}
 
     scoreMap: (map) ->
