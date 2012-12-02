@@ -9,8 +9,6 @@ class Game
         @priorities = [] 
         @fps = 50
 
-
-
         @weather = 0
         @timeSameWeather = 0
 
@@ -78,8 +76,6 @@ class Game
         @FOOD_HUNTING = 4
         @FOOD_HUNTING_FIRE = 6
 
-
-
         #TECH
         @TECH_FIRE = 0
         @TECH_BREEDING = 1
@@ -109,6 +105,10 @@ class Game
 
         for i in [1..10]
             @addPeople()
+
+        for i in [1..5]
+            @boats.push new Boat 100*i, 10*i
+
 
         #Then we start with 1 House, 2 hunting lodge, and 1 sawmill
         @build @BUILDING_TYPE_HOUSE
@@ -174,6 +174,7 @@ class Game
 
 
         for boat in @boats
+            console.log 'got a boat'
             if !boat.navigate()
                 #we have to find him a new goal!
 
@@ -457,13 +458,13 @@ class Game
     
 
         if !@technologies[@TECH_FISH] and @resources[@WOOD] >= 80
-            discover @TECH_FISH
+            @discover @TECH_FISH
 
         if !@technologies[@TECH_FISH] and @resources[@WOOD] >= 80
-            discover @TECH_FISH
+            @discover @TECH_FISH
 
         if !@technologies[@TECH_MAP] and @technologies[@TECH_PAPER] and @technologies[@TECH_FISH] and boats.length > 5
-            discover @TECH_MAP
+            @discover @TECH_MAP
 
         if oldWeather != @weather
             @timeSameWeather = 0
