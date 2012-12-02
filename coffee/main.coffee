@@ -39,14 +39,6 @@ $ ->
 
         window.game = game
 
-        # micVisible = false
-        # $('#mic').click () ->
-        #     if not micVisible
-        #         $(this).animate({
-        #             'margin-right': -20
-        #             }, 300)
-        #         micVisible = true
-
         document.getElementById('speech_result').onwebkitspeechchange = (val) ->
             switch val.target.value
                 when 'rain', 'brain', 'wayne' 

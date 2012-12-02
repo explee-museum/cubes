@@ -30,6 +30,36 @@ class Map
             
             @tiles.push tempArray
 
+        @addShiny()
+
+    addShiny: () ->
+        for i in [0..@widthMap]
+            for j in [0..@heightMap]
+                if @tiles[i][j].type != 'water'
+                    if @tiles[i-1][j]? && @tiles[i-1][j].type != @tiles[i][j].type
+                        for k in [0..4]
+                            r = Math.random()
+                            if r > 0.7
+                                @tiles[i][j].changePixel 0, k, @tiles[i-1][j].sprites
+                    if @tiles[i+1][j]? && @tiles[i+1][j].type != @tiles[i][j].type
+                        for k in [0..4]
+                            r = Math.random()
+                            if r > 0.7
+                                @tiles[i][j].changePixel 4, k, @tiles[i+1][j].sprites
+
+                    if @tiles[i][j-1]? && @tiles[i][j-1].type != @tiles[i][j].type
+                        for k in [0..4]
+                            r = Math.random()
+                            if r > 0.7
+                                @tiles[i][j].changePixel k, 0, @tiles[i][j-1].sprites
+
+                    if @tiles[i][j+1]? && @tiles[i][j+1].type != @tiles[i][j].type
+                        for k in [0..4]
+                            r = Math.random()
+                            if r > 0.7
+                                @tiles[i][j].changePixel k, 4, @tiles[i][j+1].sprites
+
+
     randomMap: () ->
         console.log 'randomize'
         
@@ -38,12 +68,10 @@ class Map
         @draw ctx
 
     draw: (ctx) ->
-        console.log 'drawing...'
-        console.log @widthMap
         for i in [0..@widthMap]
             for j in [0..@heightMap]
-                console.log 'draw tile'
                 @tiles[i][j].draw ctx, i, j
+
 
 
 

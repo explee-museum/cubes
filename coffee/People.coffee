@@ -4,6 +4,8 @@ class People
         @state = 'IDLE'
         @goal = [-1,-1]
         @age = 0
+        @timeDead = 0
+        @isDead = false
 
     walk: () ->
         if @goal[0] < 0 
@@ -32,10 +34,13 @@ class People
         #console.log "GOING TO " + x + "," + y
         @goal = [x,y]
 
-
     draw: (ctx) ->
         ctx.drawImage @spriteElement.spritesheet.image, @spriteElement.i*8, @spriteElement.j*8, 8, 8, @posX, @posY, 8, 8
-    
+
+    setDead: () ->
+        @spriteElement.i = 1
+        @spriteElement.j = 0
+
 if typeof module isnt 'undefined' && module.exports
     exports.People = People
 else 
