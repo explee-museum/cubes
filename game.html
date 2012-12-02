@@ -20,10 +20,10 @@
   
   </head>
     <body>
-        <div id="log">
+<!--         <div id="log">
             Decoded frames: 0 Avg: 0<br>
             Dropped frames: 0 Avg: 0<br>
-        </div>
+        </div> -->
         <div id="color"></div>
         <div id="pop">
             <div id="pop_count"></div>
@@ -37,9 +37,8 @@
         <canvas id="frontVideo" width="320" height="240"></canvas>
         <canvas id="frontVideoDebug" width="320" height="240"></canvas>
 
-        <div id="technos">
-            
-        </div>
+        <div id="technos"></div>
+        <div id="score"></div>
 
         <canvas id="back" width="640" height="480"></canvas>
         <canvas id="front" width="640" height="480"></canvas>
@@ -69,13 +68,13 @@
         <script type="text/javascript" src="js/BlobDetector.js"></script>
         <script type="text/javascript" src="js/Cv.js"></script>
         <script type="text/javascript" src="js/Stats.js"></script>
+        <script type="text/javascript" src="js/Video.js"></script>
         <script type="text/javascript">            
             //GetUserMedia
             window.URL = window.URL || window.webkitURL;
             navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-            var video = document.querySelector('video');
-            var Stats = new Stats(video);
+            var Stats = new Stats(webcam);
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({audio: false, video: true}, function(stream) {
                     Stats.startTest(window.URL.createObjectURL(stream));
@@ -89,96 +88,25 @@
                     };
             })();
 
-            //Init Video
-            var frontVideoCanvas = document.getElementById('frontVideo');
-            var ctx = frontVideoCanvas.getContext('2d');
-            var backVideoCanvas = document.getElementById('backVideo');
-            var backCtx = backVideoCanvas.getContext('2d');
-            var debugVideoCanvas = document.getElementById('frontVideoDebug');
-            var debugVideoCtx = debugVideoCanvas.getContext('2d');
-            var debugCanvas = document.getElementById('frontDebug');
-            var debugCtx = debugCanvas.getContext('2d');
-
-            var Cv = new Cv(backVideoCanvas);
-            var BlobDetector = new BlobDetector(Cv, backVideoCanvas);
-
-            var mousex = mousey = 0;
-            var offset = $(frontVideoCanvas).offset();
-            var colorDiv = document.getElementById('color');
-            $(frontVideoCanvas).mousemove(function(e){
-                mousex = Math.floor(e.pageX - offset.left);
-                mousey = Math.floor(e.pageY - offset.top);
-                colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey);
-                colorDiv.innerHTML = colorStr;
-            });
+            // var mousex = mousey = 0;
+            // var offset = $(frontVideoCanvas).offset();
+            // var colorDiv = document.getElementById('color');
+            // $(frontVideoCanvas).mousemove(function(e){
+            //     mousex = Math.floor(e.pageX - offset.left);
+            //     mousey = Math.floor(e.pageY - offset.top);
+            //     colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey);
+            //     colorDiv.innerHTML = colorStr;
+            // });
 
             var log = document.getElementById('log');
-            var weight = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9]
-            var lastFrame = savedTilex = null;
-            var fakeDuration = 0;
-            var active = false;
             function update() {
-                Stats.calculate(log);
+                // Stats.calculate(log);
+
                 //Request a frame
                 requestAnimFrame(update);
-                //Plug the video element to canvas
-                backCtx.drawImage(video, 0, 0, video.width, video.height);                
 
-                //Draw result
-                // var rBounds = BlobDetector.detect(35, 50, ctx);
-                // var rb = Cv.convertBounds(rBounds, frontVideoCanvas, debugCanvas);
-
-                var bBounds = BlobDetector.detect(185, 210);
-                var bb = Cv.convertBounds(bBounds, frontVideoCanvas, debugCanvas);
-
-                // var gBounds = BlobDetector.detect(90, 105, ctx)
-                // var gb = Cv.convertBounds(gBounds, frontVideoCanvas, debugCanvas);
-                if(lastFrame === null) {
-                  lastFrame = backCtx.getImageData(0, 0, backVideoCanvas.width, backVideoCanvas.height)
-                }
-                var frame = backCtx.getImageData(0, 0, backVideoCanvas.width, backVideoCanvas.height)
-                var isOnZone = BlobDetector.blend(lastFrame, frame, ctx);
-                if(isOnZone && active === false) {
-                  active = true
-                }
-                lastFrame = frame
-
-                debugCanvas.width = debugCanvas.width;
-                // debugCtx.translate(debugCanvas.width, 0);
-                // debugCtx.scale(-1, 1);
-                if(active){
-                    // ctx.fillStyle = 'red';
-                    // ctx.fillRect(Math.floor(rBounds.x), Math.floor(rBounds.y), 5, 5);
-                    ctx.fillStyle = 'blue';
-                    ctx.fillRect(Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5);
-                    // ctx.fillStyle = 'green';
-                    // ctx.fillRect(Math.floor(gBounds.x), Math.floor(gBounds.y), 5, 5);
-                    // debugCtx.fillStyle = 'red';
-                    // debugCtx.fillRect(50 * Math.floor(rb.x/50), 50 * Math.floor(rb.y/50), 50, 50);
-                    debugCtx.fillStyle = 'blue';
-                    var tilex = Math.floor(bb.x/50)
-                    var tiley = Math.floor(bb.y/50)
-                    
-                    if(tilex === savedTilex && tiley === savedTiley)
-                        fakeDuration++;
-                    else
-                        fakeDuration = 0;
-                    savedTilex = tilex;
-                    savedTiley = tiley;
-
-                    console.log(fakeDuration);
-                    if (fakeDuration > 25){
-                      console.log("added")
-                      game.map.addMapElement('grass', tilex, tiley, ctxBack);
-                      active = false;
-                      savedTilex = null;
-                      fakeDuration = 0;
-                    }
-                    debugCtx.fillRect(50 * tilex, 50 * tiley, 50, 50);
-                    // debugCtx.fillStyle = 'green';
-                    // debugCtx.fillRect(50 * Math.floor(gb.x/50), 50 * Math.floor(gb.y/50), 50, 50);  
-                }
-                
+                //Process the frame
+                video.update()
             }
         </script>
     </body>

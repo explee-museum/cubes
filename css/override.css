@@ -103,6 +103,19 @@ html, body {
     color: white;
 }
 
+#score {
+    position: absolute;
+    top:10px;
+    left:100px;
+    margin-left: -200px;
+    height:20px;
+    width:400px;
+    z-index: 11;
+    font-size: 2.3em;
+    text-align: center;
+    color: white; 
+}
+
 /* Video section */
 #webcam, #backVideo {
             display: none;

@@ -20,6 +20,9 @@ class Game
         @interval = null
         @realInterval = 0
 
+        @score = 1
+        @scoreTechno = 1
+
         # Sprite for peoples
         @spritePeople = new Spritesheet 'img/spritePeople.png', 8
         @spritePeopleElements = [] 
@@ -109,7 +112,6 @@ class Game
         for i in [1..10]
             @addPeople()
 
-
         #Then we start with 1 House, 2 hunting lodge, and 1 sawmill
         @build @BUILDING_TYPE_HOUSE
         @build @BUILDING_TYPE_HUNTING_LODGE
@@ -132,12 +134,22 @@ class Game
         document.getElementById('wood_count').innerHTML = @resources[2]
 
 
+
+
         if @realInterval % 30 == 0
             @nextTurn()
             @addWeatherElements()
 
-        if @realInterval % 10 == 0
-            document.getElementById('technos').innerHTML = ''
+            for t in @technologies
+                if t
+                    @score += 2
+
+            @score += @peoples.length
+
+            document.getElementById('score').innerHTML = @score
+
+        # if @realInterval % 50 == 0
+            # document.getElementById('technos').innerHTML = ''
 
         if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
@@ -174,11 +186,10 @@ class Game
 
 
         for boat in @boats
-            console.log 'got a boat'
             if !boat.navigate()
-                #we have to find him a new goal!
 
                 if @technologies[@MAP]
+
                     j = boat.srcY+Math.round (Math.random() * 5 -2)
                     i = boat.srcX+Math.round (Math.random() * 5 -2)
                     while (i>0 and j>0 and i< @map.widthMap and j < @map.heightMap and @map.tiles[i][j].type != "water")
@@ -758,7 +769,6 @@ class Game
             return [-1,-1]
 
 
-
         for i in [0..@map.widthMap]
             for j in [0..@map.heightMap]
                 # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
@@ -769,8 +779,6 @@ class Game
             index = Math.floor(Math.random() * results.length)
             return results[index]
         return [-1,-1]
-
-
 
 
 if typeof module isnt 'undefined' && module.exports

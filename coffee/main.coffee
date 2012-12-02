@@ -36,9 +36,34 @@ $ ->
 
         game = new Game ctxFront, ctxBack, ctxWeather, document.width, document.height
         game.init()        
-
         window.game = game
 
+        # Video
+        window.webcam = document.getElementById 'webcam'
+        frontVideoCanvas = document.getElementById 'frontVideo'
+        frontVideoCtx = frontVideoCanvas.getContext '2d'
+
+        backVideoCanvas = document.getElementById 'backVideo'
+        backVideoCtx = backVideoCanvas.getContext '2d'
+
+        debugVideoCanvas = document.getElementById 'frontVideoDebug'
+        debugVideoCtx = debugVideoCanvas.getContext '2d'
+
+        debugCanvas = document.getElementById 'frontDebug'
+        debugCtx = debugCanvas.getContext '2d'
+
+        cv = new Cv backVideoCanvas
+        window.cv = cv
+
+        blobDetector = new BlobDetector(Cv, backVideoCanvas);
+        window.blobDetector = blobDetector
+
+        video = new Video window.webcam, frontVideoCanvas, frontVideoCtx, backVideoCanvas, backVideoCtx, debugVideoCanvas, debugVideoCtx, game
+        console.log 'ttttttttertertzertzrtzet'
+        window.video = video
+        
+
+        # Audio
         document.getElementById('speech_result').onwebkitspeechchange = (val) ->
             switch val.target.value
                 when 'rain', 'brain', 'wayne' 
@@ -57,3 +82,7 @@ $ ->
         $('canvas').click (event) ->
             console.log event.pageX
             console.log event.pageY
+
+        document.getElementById('technos').addEventListener('DOMSubtreeModified', () ->
+            $('#technos').show().fadeOut 3000
+        ,false)

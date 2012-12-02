@@ -33,12 +33,11 @@ class MapElement
             @tiles.push temp
 
     draw: (ctx, x, y) ->
-            for i in [0...@size]
-                for j in [0...@size]
-                    # console.log 'drawing tile...'
-                    spriteElem = @tiles[i][j]
-                    ctx.drawImage spriteElem.spritesheet.image, spriteElem.i * 10, spriteElem.j * 10, 10, 10, x*50+i*10, y*50+j*10, 10, 10
-                
+        for i in [0...@size]
+            for j in [0...@size]
+                spriteElem = @tiles[i][j]
+                ctx.drawImage spriteElem.spritesheet.image, spriteElem.i * 10, spriteElem.j * 10, 10, 10, x*50+i*10, y*50+j*10, 10, 10
+            
 
     changePixel: (i, j, sprites) ->
         numTem = Math.round(Math.random() * (sprites.length-1))
