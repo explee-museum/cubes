@@ -1,9 +1,11 @@
 class Boat
-    constructor: (@posX, @posY, @spriteElement=null) ->
+    constructor: (@posX, @posY) ->
         @srcX = Math.round(@posX/50)
         @srcY = Math.round(@posY/50)
         @age = 0
         @goal = [-1,-1]
+        @image = new Image()
+        @image.src = 'img/boat.png'
 
     navigate: () ->
         if @goal[0] < 0
@@ -34,7 +36,7 @@ class Boat
 
 
     draw: (ctx) ->
-        ctx.drawImage @spriteElement.spritesheet.image, @spriteElement.i*8, @spriteElement.j*8, 8, 8, @posX, @posY, 8, 8
+        ctx.drawImage @image, 0, 0, 10, 20, @posX, @posY, 10, 20
 
 if typeof module isnt 'undefined' && module.exports
     exports.Boat = Boat
