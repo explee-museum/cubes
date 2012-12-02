@@ -317,8 +317,6 @@ class Game
 
         
         #Calculate if we need to build more temples
-        
-
         console.log "We are "+@peoples.length
         console.log "They gonna die : "+numberOfDeath
 
