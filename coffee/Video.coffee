@@ -1,70 +1,54 @@
 class Video
-    constructor: (@webcam, @canvasFront, @canvasBack) ->
-        @ctxFront = @canvasFront.getContext '2d'
-        @ctxBack = @canvasBack.getContext '2d'
+    constructor: (@webcam, @canvasVideoFront, @ctxVideoFront, @canvasVideoBack, @ctxVideoBack, @canvasVideoDebug, @ctxVideoDebug, @game) ->
+        @cv = new Cv @canvasVideoBack
+        @blobDetector = new BlobDetector @cv, @canvasVideoBack
 
-        cv = new Cv @canvasBack
-        @blobDetector = new BlobDetector cv, @canvasBack
-        @Stats = new Stats @webcam
+        @active = false
+        @tilex = @tiley = @savedTilex = @savedTiley = null
+        @fakeDuration = 0
 
-    # init: () ->
-    #     window.URL = window.URL || window.webkitURL
-    #     navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-    #     @requestAnimFrame = () ->
-    #         return  window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || ( callback ) ->
-    #                 window.setTimeout canvasllback, 1000 / 60
-
-    #     mousex = mousey = 0
-    #     # offset = $(frontVideoCanvas).offset()
-    #     # colorDiv = document.getElementById('color')
-    #     # $(frontVideoCanvas).mousemove () ->
-    #     #     mousex = Math.floor(e.pageX - offset.left)
-    #     #     mousey = Math.floor(e.pageY - offset.top)
-    #     #     colorStr = BlobDetector.getPixelColor(backCtx, mousex, mousey)
-    #     #     colorDiv.innerHTML = colorStr
-
-    #     @log = document.getElementById 'log'
-    #     @weight = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9]
-
-    #     @Stats = new Stats @webcam
-    #     if navigator.getUserMedia
-    #         navigator.getUserMedia {audio: false, video: true}, (stream) =>
-    #             @Stats.startTest window.URL.createObjectURL(stream)
-    #             @update()
-    #         , () ->
-    #             console.log('you fail');
-
+        @lastFrame = @frame = null
 
     update: () ->        
-        @Stats.calculate @log
-        @requestAnimFrame @update
+        # Plug the video element to canvas
+        @ctxVideoBack.drawImage @webcam, 0, 0, @webcam.width, @webcam.height
 
-        # webcam to canvas link
-        @ctxBack.drawImage @webcam, 0, 0, @webcam.width, @webcam.height
-        pixels = @ctxBack.getImageData 0, 0, @canvasBack.width, @canvasBack.height
-        console.log 'pixels', pixels.data
+        # rBounds = BlobDetector.detect(35, 50, ctx)
+        bBounds = @blobDetector.detect 185, 210
+        # gBounds = BlobDetector.detect(90, 105, ctx)        
+        bb = @cv.convertBounds bBounds, @canvasVideoFront, @canvasVideoDebug
+        
+        @frame = @ctxVideoBack.getImageData(0, 0, @canvasVideoBack.width, @canvasVideoBack.height)
+        if @lastFrame is null then @lastFrame = @frame
+        isOnZone = @blobDetector.blend(@lastFrame, @frame, @ctxVideoFront)
+        if (isOnZone and @active is false) then @active = true
+        @lastFrame = @frame
 
-        # some freaky functions
-        # pixels = @ctxBack.getImageData 0, 0, @canvasBack.width, @canvasBack.height
-        # frame = Cv.convolute(pixels, weight, false);
-        # @ctxBack.putImageData(frame, 0, 0);
+        @canvasVideoDebug.width = @canvasVideoDebug.width
+        if @active          
+            # minimap
+            # ctx.fillRect(Math.floor(rBounds.x), Math.floor(rBounds.y), 5, 5)
+            # ctx.fillRect(Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5)            
+            # ctx.fillRect(Math.floor(gBounds.x), Math.floor(gBounds.y), 5, 5)
+            
+            @tilex = Math.floor(bb.x/50)
+            @tiley = Math.floor(bb.y/50)
+            if(@tilex is @savedTilex && @tiley is @savedTiley)
+                @fakeDuration++
+            else
+                @fakeDuration = 0
+            @savedTilex = @tilex
+            @savedTiley = @tiley
 
-        # Debugging purpose : showing the webcam
-        frame = @ctxBack.getImageData 0, 0, @canvasFront.width, @canvasFront.height
-        @ctxFront.putImageData frame, 0, 0
+            if @fakeDuration > 25
+                @game.map.addMapElement 'grass', @tilex, @tiley, @ctxVideoBack
+                @active = false
+                @savedTilex = null
+                @fakeDuration = 0
 
-        # Draw result       
-        # rBounds = BlobDetector.detect(35, 50);
-        bBounds = @blobDetector.detect 185, 210, @ctxFront
-
-        # gBounds = BlobDetector.detect(90, 105);         
-        # ctx.fillStyle = 'red';
-        # ctx.fillRect(Math.floor(rBounds.x),Math.floor(rBounds.y), 5, 5);
-        @ctxFront.fillStyle = 'blue'
-        @ctxFront.fillRect Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5
-        # ctx.strokeStyle = 'green';
-        # ctx.strokeRect(gBounds.x, gBounds.y, 50, 50);
+            @ctxVideoDebug.fillStyle = 'red'
+            @ctxVideoDebug.fillRect(50 * @tilex, 50 * @tiley, 50, 50)
+                
 
 if typeof module isnt 'undefined' && module.exports
     exports.Video = Video
