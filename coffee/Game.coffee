@@ -3,6 +3,7 @@ class Game
         @resources = []
         @map = null
         @peoples = []
+        @boats = []
         @buildings = []
         @technologies = []
         @priorities = [] 
@@ -43,6 +44,8 @@ class Game
         @BUILDING_TYPE_HUNTING_LODGE = 6
         @BUILDING_TYPE_HARBOR = 7
 
+        @BUILDING_NUMBER_HARBOR = 0
+
         #BUILDING COSTS
         @GRANARY_COST = 20
         @TEMPLE_COST = 40
@@ -52,6 +55,7 @@ class Game
         @PASTURE_COST = 20
         @HARBOR_COST = 30
         @SAWMILL_COST = 10
+        @BOAT_COST = 5
 
         #DIVERS
         @FOOD_COMSUPTION = 1
@@ -66,6 +70,7 @@ class Game
         @PRIORITY_FAITH = 3
         @PRIORITY_GRANARY = 4
         @PRIORITY_HOUSE = 5
+        @PRIORITY_HARBOR = 6
 
         #FOOD
         @FOOD_FARM = 8
@@ -112,7 +117,7 @@ class Game
         @build @BUILDING_TYPE_SAWMILL 
 
 
-        @priorities = [0,0,0,0,0,0]
+        @priorities = [0,0,0,0,0,0,0]
         @technologies = [false, false, false, false, false, false, false, false, false, false, false, false]
 
         @interval = setInterval @myLoop, 100
@@ -166,6 +171,31 @@ class Game
                 people.findNewGoal i*50,j*50
 
             people.draw @ctxFront
+
+
+        for boat in @boats
+            if !boat.navigate()
+                #we have to find him a new goal!
+
+                if @technologies[@MAP]
+                    j = boat.srcX+Math.round (Math.random() * 5 -2)
+                    i = boat.srcY+Math.round (Math.random() * 5 -2)
+                    while (@map.tiles[i][j].type != "water")
+                        j = boat.srcX+Math.round (Math.random() * 5 -2)
+                        i = boat.srcY+Math.round (Math.random() * 5 -2)
+
+                    boat.findNewGoal i*50,j*50
+                else
+
+                    j = boat.srcX+Math.round (Math.random() * 3 -1)
+                    i = boat.srcY+Math.round (Math.random() * 3 -1)
+                    while (@map.tiles[i][j].type != "water")
+                        j = boat.srcX+Math.round (Math.random() * 3 -1)
+                        i = boat.srcY+Math.round (Math.random() * 3 -1)
+
+                    boat.findNewGoal i*50,j*50
+
+            boat.draw @ctxFront
 
         for building in @buildings
             building.draw @ctxBack
@@ -274,6 +304,14 @@ class Game
         woodToAdd = 0
         maxPeople = 5 #basic max of people
         
+        for boat in @boats
+            x = Math.round(boat.posX/50)
+            y = Math.round(boat.posY/50)
+            if @map.tiles[x][y].res > 0 and @map.tiles[x][y] = "water"
+                @map.tiles[x][y].res--
+                foodToAdd += @FOOD_BOAT
+
+
         for building in @buildings
             if @map.tiles[building.posX][building.posY].res <= 0 
                     continue
@@ -397,7 +435,7 @@ class Game
             for i in [0..@map.widthMap]
                 for j in [0..@map.heightMap]
                     if @map.tiles[i][j].type == "mountain" then mountainCount++
-            if mountainCount > 2 then discover @TECH_WHEEL
+            if mountainCount > 2 then @discover @TECH_WHEEL
 
         if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
             @discover @TECH_AGRICULTURE
@@ -420,6 +458,15 @@ class Game
             @discover @TECH_ARCHITECTURE
     
 
+        if !@technologies[@TECH_FISH] and @resources[@WOOD] >= 80
+            discover @TECH_FISH
+
+        if !@technologies[@TECH_FISH] and @resources[@WOOD] >= 80
+            discover @TECH_FISH
+
+        if !@technologies[@TECH_MAP] and @technologies[@TECH_PAPER] and @technologies[@TECH_FISH] and boats.length > 5
+            discover @TECH_MAP
+
         if oldWeather != @weather
             @timeSameWeather = 0
         else
@@ -427,7 +474,8 @@ class Game
 
             #effects from time
 
-
+        if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR == 0 
+            @priorities[@PRIORITY_HARBOR] += 3
 
 
 
@@ -449,6 +497,8 @@ class Game
             name = 'agriculture'
         else if indexTechno == @TECH_FISH
             name = 'fish'
+        else if indexTechno == @TECH_MAP
+            name == 'map'
 
         document.getElementById('technos').innerHTML = 'You just discovered ' + name + '!'
 
@@ -479,7 +529,10 @@ class Game
                 else
                     @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
             when @PRIORITY_FOOD
-                if @build(@BUILDING_TYPE_PASTURE) or @build(@BUILDING_TYPE_FARM) or @build(@BUILDING_TYPE_HUNTING_LODGE)
+                if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR > 0 and @resources[@WOOD] > @BOAT_COST
+                    @buildABoat()
+                    @priorities[@PRIORITY_FOOD] = 0
+                else if @build(@BUILDING_TYPE_PASTURE) or @build(@BUILDING_TYPE_FARM) or @build(@BUILDING_TYPE_HUNTING_LODGE)
                     @priorities[@PRIORITY_FOOD] = 0
 
                 else
@@ -490,6 +543,24 @@ class Game
                     @priorities[@PRIORITY_HOUSE] = 0
                 else
                     @priorities[@PRIORITY_WOOD] += @HOUSE_COST
+
+            when @PRIORITY_HARBOR
+                if @build @BUILDING_TYPE_HARBOR
+                    @priorities[@PRIORITY_HARBOR] = 0
+                else
+                    @priorities[@PRIORITY_WOOD] += @HARBOR_COST
+
+    #search for a harbor, and build a fucking boat there!
+    buildABoat: () ->
+        harborList = []
+        for building in @buildings
+            if building.type == BUILDING_TYPE_HARBOR
+                harborList.push(building)
+        if harborList.length > 0
+            i = Math.round(Math.random() * harborList.length)
+            building = harborList[i]
+            boats.push(new Boat building.posX*50, building.posY*50)
+
 
 
 
@@ -615,20 +686,54 @@ class Game
                 return true
 
             when @BUILDING_TYPE_HARBOR
+
+                console.log "I WANT TO BUILD HARBOR :" + @HARBOR_COST + " > " + @resources[@WOOD]
                 if @HARBOR_COST > @resources[@WOOD] or !@technologies[@TECH_FISH] then return false
-                #create a new building
+                pos = @findSlot "harbor"
+                if pos[0] == -1 then return true
+                building = new Building @BUILDING_TYPE_HARBOR, @spriteBuildings
+                building.posX = pos[0]
+                building.posY = pos[1]
+                @map.tiles[pos[0]][pos[1]].building = building
+                @buildings.push building
+                @resources[@WOOD] -= @HARBOR_COST
+                @BUILDING_NUMBER_HARBOR++
+
+                console.log "SUCCESS : final wood " + @resources[@WOOD]
                 return true
 
     #type : string
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
+        results = []
+        if searchType == "harbor"
+            for i in [0..@map.widthMap]
+                for j in [0..@map.heightMap]
+                  # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
+                    if @map.tiles[i][j].type == "water" and @map.tiles[i][j].building == null
+                        notWaterCounter = 0
+                        for co in [-1..2]
+                            for ce in [-1..2]
+                                if i+co > 0 and j+ce > 0 and i+co < @map.widthMap and j+ce < @map.heightMap and @map.tiles[i+co][j+ce].type != "water"
+                                    notWaterCounter++
+                        if notWaterCounter > 1
+                            results.push([i,j])
+            if results.length > 0
+                i = Math.round(Math.random() * results.length)
+                return results[i]
+            return [-1,-1]
+
+
 
         for i in [0..@map.widthMap]
             for j in [0..@map.heightMap]
                 # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
                 if @map.tiles[i][j].type == searchType and @map.tiles[i][j].building == null
                     # console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
-                    return [i,j]
+                    results.push([i,j])
+        if results.length > 0
+            i = Math.round(Math.random() * results.length)
+            return results[i]
         return [-1,-1]
 
 

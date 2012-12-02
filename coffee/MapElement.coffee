@@ -14,7 +14,10 @@ class MapElement
 
         @size =  size / spritesheetGlobal.offset
         @building = null
-        @res = 50
+        if @type = "water"
+            @res = 200
+        else
+            @res = 50
         @init()
 
     init: () ->
