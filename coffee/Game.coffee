@@ -18,6 +18,9 @@ class Game
         @interval = null
         @realInterval = 0
 
+        @score = 1
+        @scoreTechno = 1
+
         # Sprite for peoples
         @spritePeople = new Spritesheet 'img/spritePeople.png', 8
         @spritePeopleElements = [] 
@@ -106,8 +109,8 @@ class Game
         for i in [1..10]
             @addPeople()
 
-        for i in [1..5]
-            @boats.push new Boat 100*i, 10*i
+        # for i in [1..5]
+        #     @boats.push new Boat 100*i, 10*i
 
 
         #Then we start with 1 House, 2 hunting lodge, and 1 sawmill
@@ -132,12 +135,22 @@ class Game
         document.getElementById('wood_count').innerHTML = @resources[2]
 
 
+
+
         if @realInterval % 30 == 0
             @nextTurn()
             @addWeatherElements()
 
-        if @realInterval % 10 == 0
-            document.getElementById('technos').innerHTML = ''
+            for t in @technologies
+                if t
+                    @score += 2
+
+            @score += @peoples.length
+
+            document.getElementById('score').innerHTML = @score
+
+        # if @realInterval % 50 == 0
+            # document.getElementById('technos').innerHTML = ''
 
         if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
@@ -174,22 +187,21 @@ class Game
 
 
         for boat in @boats
-            console.log 'got a boat'
             if !boat.navigate()
-                #we have to find him a new goal!
 
                 if @technologies[@MAP]
                     j = boat.srcX+Math.round (Math.random() * 5 -2)
                     i = boat.srcY+Math.round (Math.random() * 5 -2)
+
                     while (@map.tiles[i][j].type != "water")
                         j = boat.srcX+Math.round (Math.random() * 5 -2)
                         i = boat.srcY+Math.round (Math.random() * 5 -2)
 
                     boat.findNewGoal i*50,j*50
                 else
-
                     j = boat.srcX+Math.round (Math.random() * 3 -1)
                     i = boat.srcY+Math.round (Math.random() * 3 -1)
+
                     while (@map.tiles[i][j].type != "water")
                         j = boat.srcX+Math.round (Math.random() * 3 -1)
                         i = boat.srcY+Math.round (Math.random() * 3 -1)
@@ -723,7 +735,6 @@ class Game
             return [-1,-1]
 
 
-
         for i in [0..@map.widthMap]
             for j in [0..@map.heightMap]
                 # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
@@ -734,8 +745,6 @@ class Game
             i = Math.round(Math.random() * results.length)
             return results[i]
         return [-1,-1]
-
-
 
 
 if typeof module isnt 'undefined' && module.exports

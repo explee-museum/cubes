@@ -57,3 +57,7 @@ $ ->
         $('canvas').click (event) ->
             console.log event.pageX
             console.log event.pageY
+
+        document.getElementById('technos').addEventListener('DOMSubtreeModified', () ->
+            $('#technos').show().fadeOut 3000
+        ,false)
