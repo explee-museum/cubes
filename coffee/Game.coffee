@@ -3,6 +3,8 @@ class Game
         @resources = []
         @map = null
         @peoples = []
+        @alivePeople = 0
+
         @boats = []
         @buildings = []
         @technologies = []
@@ -126,7 +128,7 @@ class Game
         # Clear front canvas
         @ctxFront.clearRect 0, 0, @width, @height
         
-        document.getElementById('pop_count').innerHTML = @peoples.length
+        document.getElementById('pop_count').innerHTML = @alivePeople
         document.getElementById('mana_count').innerHTML = @resources[0]
         document.getElementById('food_count').innerHTML = @resources[1]
         document.getElementById('wood_count').innerHTML = @resources[2]
@@ -134,14 +136,6 @@ class Game
         if @realInterval % 30 == 0
             @nextTurn()
             @addWeatherElements()
-
-            for t in @technologies
-                if t
-                    @score += 2
-
-            @score += @peoples.length
-
-            document.getElementById('score').innerHTML = @score
 
         # if @realInterval % 50 == 0
             # document.getElementById('technos').innerHTML = ''
@@ -167,7 +161,7 @@ class Game
 
         # Perform actions
         for people in @peoples
-            if !people.walk()
+            if !people.isDead and !people.walk()
                 #we have to find him a new goal!
                 j = Math.round (Math.random() * @map.heightMap)
                 i = Math.round (Math.random() * @map.widthMap)
@@ -210,8 +204,22 @@ class Game
         @realInterval += 1
 
     addPeople: () ->
-        r = Math.round(Math.random() * (@spritePeopleElements.length-1))
-        people = new People Math.round(@map.widthMap/2)*50, Math.round(@map.heightMap/2)*50, @spritePeopleElements[r]
+
+        #trying to find a house to spawn new people
+        houses = []
+        for building in @buildings
+            if building.type == @BUILDING_TYPE_HOUSE
+                houses.push building
+
+        if !houses.length > 0
+            r = Math.round(Math.random() * (@spritePeopleElements.length-1))
+            people = new People Math.round(@map.widthMap/2)*50, Math.round(@map.heightMap/2)*50, @spritePeopleElements[r]     
+
+        else
+            index = Math.floor(Math.random() * houses.length)
+            r = Math.round(Math.random() * (@spritePeopleElements.length-1))
+            people = new People houses[index].posX*50+25, houses[index].posY*50+25, @spritePeopleElements[r]
+        
         people.draw(@ctxFront)
         @peoples.push people
 
@@ -296,8 +304,15 @@ class Game
             if building.type == @BUILDING_TYPE_SAWMILL
                     woodCapacity += 20
 
+
+
+
+        @alivePeople = @peoples.length
+        for people in @peoples
+            if people.isDead then @alivePeople--
+
         #food expanses
-        sum = @peoples.length * @FOOD_COMSUPTION
+        sum = @alivePeople * @FOOD_COMSUPTION
         if  sum > @resources[@FOOD]
             numberOfDeath = sum - @resources[@FOOD]
             @resources[@FOOD] = 0
@@ -362,43 +377,54 @@ class Game
 
         
         #Calculate if we need to build more temples
-        console.log "We are "+@peoples.length
+        console.log "We are "+@alivePeople
         console.log "They gonna die : "+numberOfDeath
 
         #kill peoples
         killCounter = numberOfDeath
         while killCounter > 0
-           killCounter--
            deadIndex = Math.floor(Math.random()*@peoples.length)
-           @peoples.splice deadIndex, 1
+           if !@peoples[deadIndex].isDead
+                killCounter--
+                @peoples[deadIndex].isDead = true
+            #@peoples.splice deadIndex, 1
+
+
+
+        peoplesToDel = []
+        for people ,k in @peoples
+            if people.isDead
+                people.timeDead++
+                if people.timeDead > 5
+                    peoplesToDel.push k
+
+        for iPeople in peoplesToDel
+            @peoples.splice iPeople, 1
+
 
 
         @priorities[@PRIORITY_FAITH]++
 
         #create peoples
         if numberOfDeath > 0
-            numberOfBorn = 0.125* Math.random()*@peoples.length
+            numberOfBorn = 0.125* Math.random()*@alivePeople
             #create 1/8 peoples size * random factor
         else
-            numberOfBorn = Math.random()*@peoples.length
+            numberOfBorn = Math.random()*@alivePeople
             #create 1/4 peoples size * random factor
 
-
-        #natural dying
-        toRemove = []
         for speople, k in @peoples
             speople.age++
             if Math.random() * @MAX_AGE < speople.age
-                toRemove.push k
+                if !speople.isDead
+                    speople.isDead = true
 
-        for i in toRemove
-            console.log 'DIED FROM NATURAL DEATH'
-            @peoples.splice i, 1
+        
 
         bornCounter = Math.floor numberOfBorn
         while bornCounter > 0
             bornCounter--
-            if maxPeople == @peoples.length
+            if maxPeople == @alivePeople
                 @priorities[@PRIORITY_HOUSE]+=3
             else
                 @addPeople()            
@@ -420,14 +446,15 @@ class Game
             coldDie = Math.random() * 10 < 2
             if coldDie
                 if @technologies[@TECH_FIRE]
-                    killCounter = 1/10 * @peoples.length
+                    killCounter = 1/10 * @alivePeople
                 else
-                    killCounter = 1/3 * @peoples.length
+                    killCounter = 1/3 * @alivePeople
                 while killCounter > 0
-                    killCounter--
                     deadIndex = Math.floor(Math.random()*@peoples.length)
-                    @DEATH_FROM_ICE++
-                    @peoples.splice deadIndex, 1
+                    if !@peoples[deadIndex].isDead
+                        killCounter--
+                        @peoples[deadIndex].isDead = true
+                        @DEATH_FROM_ICE++
 
 
 
@@ -442,7 +469,7 @@ class Game
                     if @map.tiles[i][j].type == "mountain" then mountainCount++
             if mountainCount > 2 then @discover @TECH_WHEEL
 
-        if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @peoples.length > 50
+        if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @alivePeople > 50
             @discover @TECH_AGRICULTURE
 
         if !@technologies[@TECH_BREEDING] and @technologies[@TECH_FIRE]
@@ -726,7 +753,7 @@ class Game
                         if notWaterCounter > 1
                             results.push([i,j])
             if results.length > 0
-                i = Math.round(Math.random() * results.length)
+                i = Math.floor(Math.random() * results.length)
                 return results[i]
             return [-1,-1]
 
@@ -738,7 +765,7 @@ class Game
                     # console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
                     results.push([i,j])
         if results.length > 0
-            index = Math.round(Math.random() * results.length)
+            index = Math.floor(Math.random() * results.length)
             return results[index]
         return [-1,-1]
 
