@@ -35,7 +35,10 @@ class People
         @goal = [x,y]
 
     draw: (ctx) ->
-        ctx.drawImage @spriteElement.spritesheet.image, @spriteElement.i*8, @spriteElement.j*8, 8, 8, @posX, @posY, 8, 8
+        if !@isDead
+            ctx.drawImage @spriteElement.spritesheet.image, @spriteElement.i*8, @spriteElement.j*8, 8, 8, @posX, @posY, 8, 8
+        else
+            ctx.drawImage @spriteElement.spritesheet.image, 0, 8, 8, 8, @posX, @posY, 8, 8
 
     setDead: () ->
         @spriteElement.i = 1
