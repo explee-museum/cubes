@@ -706,6 +706,7 @@ class Game
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
         results = []
+        
         if searchType == "harbor"
             for i in [0..@map.widthMap]
                 for j in [0..@map.heightMap]
