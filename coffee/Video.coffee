@@ -25,10 +25,6 @@ class Video
 
         @canvasVideoDebug.width = @canvasVideoDebug.width
         if @active          
-            # minimap
-            # ctx.fillRect(Math.floor(rBounds.x), Math.floor(rBounds.y), 5, 5)
-            # ctx.fillRect(Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5)            
-            # ctx.fillRect(Math.floor(gBounds.x), Math.floor(gBounds.y), 5, 5)
             
             @tilex = Math.floor((@canvasVideoDebug.width  - sizedBounds.x)/@sizeTile)
             @tiley = Math.floor(sizedBounds.y/@sizeTile)
@@ -40,6 +36,10 @@ class Video
             @savedTiley = @tiley
 
             if @fakeDuration > 25
+                if result.type isnt @game.map.tiles[@tilex][@tiley].type
+                    buildingIndex = @game.buildings.indexOf(@game.map.tiles[@tilex][@tiley].building)                    
+                    @game.buildings.splice(buildingIndex, 1)
+
                 @game.map.addMapElement result.type, @tilex, @tiley, @ctxVideoBack
                 @active = false
                 @savedTilex = null

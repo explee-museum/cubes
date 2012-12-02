@@ -24,7 +24,7 @@
             Decoded frames: 0 Avg: 0<br>
             Dropped frames: 0 Avg: 0<br>
         </div> -->
-        <div id="color">color</div>
+        <!-- <div id="color">color</div> -->
         <div id="pop">
             <div id="pop_count"></div>
             <div id="mana_count"></div>
@@ -89,16 +89,16 @@
             })();
 
             //Color picker
-            var mousex = mousey = 0;
-            var offset = $('#frontVideo').offset(); 
-            var colorDiv = $('#color');
-            $('#frontVideo').mousemove(function(e){
-                console.log('mousemove');
-                mousex = Math.floor(e.pageX - offset.left);
-                mousey = Math.floor(e.pageY - offset.top);
-                colorStr = blobDetector.getPixelColor($('backVideo').getContext('2d'), mousex, mousey);
-                colorDiv.innerHTML = colorStr;
-            });
+            // var mousex = mousey = 0;
+            // var offset = $('#frontVideo').offset(); 
+            // var colorDiv = $('#color');
+            // $('#frontVideo').mousemove(function(e){
+            //     mousex = Math.floor(e.pageX - offset.left);
+            //     mousey = Math.floor(e.pageY - offset.top);
+            //     var ctx = document.getElementById('backVideo').getContext('2d');
+            //     colorStr = blobDetector.getPixelColor(mousex, mousey);
+            //     colorDiv.innerHTML = colorStr;
+            // });
 
             var log = document.getElementById('log');
             function update() {

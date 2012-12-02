@@ -135,11 +135,12 @@ class BlobDetector
         @ctx.strokeRect xMin, yMin, xMax - xMin, yMax - yMin
         @ctx.restore()
 
-    getPixelColor: (ctx, x, y) ->
-        p = ctx.getImageData(x, y, 1, 1).data
+    getPixelColor: (x, y) ->
+        p = @ctx.getImageData(x, y, 1, 1).data
 
-        hsl = @cv.rgbToHsl(p[0], p[1], p[2]);
-        str = 'h:' + hsl[0] + ' s:' + hsl[1] + ' l:' + hsl[2];
+        hsl = @cv.rgbToHsl p[0], p[1], p[2]
+        str = 'h:' + hsl[0] + ' s:' + hsl[1] + ' l:' + hsl[2]
+        
         return str
         # return @cv.rgbToHex(p[0], p[1], p[2]);
 
