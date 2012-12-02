@@ -117,6 +117,12 @@ html, body {
     left:0;
     z-index: 3;
 }
+#frontVideoDebug {
+    position: absolute;
+    top:50px;
+    left:320px;
+    z-index: 3;
+}
 #frontDebug {
     position: absolute;
     z-index: 3;   

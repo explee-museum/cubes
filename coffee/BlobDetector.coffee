@@ -143,20 +143,47 @@ class BlobDetector
         return str
         # return @cv.rgbToHex(p[0], p[1], p[2]);
 
-    blend: () ->
+    blend: (lastImageData, sourceData, ctx, ctx2) ->
         width = @canvas.width
         height = @canvas.height                
-        sourceData = @ctx.getImageData(0, 0, width, height);
-
-        if typeof lastImageData is 'undefined' 
-            lastImageData = @ctx.getImageData 0, 0, width, height
-
-        blendedData = @ctx.createImageData(width, height);
+        blendedData = @ctx.createImageData width, height
 
         @differenceAccuracy blendedData.data, sourceData.data, lastImageData.data
 
-        ctxblended.putImageData(blendedData, 0, 0); 
-        lastImageData = sourceData;
+        ctx.putImageData blendedData, 0, 0 if ctx?
+
+        zone = ctx.getImageData(0, 0, 50, 50)
+        ctx2.putImageData zone, 0, 0 if ctx2?
+        average = 0  
+        len = zone.data.length-4  
+        for i in [0..len] by 4
+            average += (zone.data[i] + zone.data[i+1] + zone.data[i+2]) / 3;            
+        
+        average = Math.round(average / (zone.data.length * 0.25))
+        
+        if average > 150
+            return true
+        else
+            return false
+
+    differenceAccuracy: (target, data1, data2) ->
+        if data1.length isnt data2.length then return null
+
+        len = data1.length - 4
+        for i in[0..len] by 4
+            average1 = (data1[i] + data1[i+1] + data1[i+2]) / 3
+            average2 = (data2[i] + data2[i+1] + data2[i+2]) / 3
+            diff = @threshold(@fastAbs(average1 - average2));
+            target[i] = diff * 255
+            target[i+1] = diff * 255
+            target[i+2] = diff * 255
+            target[i+3] = 255
+
+    fastAbs: (value) ->                
+        return (value ^ (value >> 31)) - (value >> 31)
+
+    threshold: (value) ->
+        return (value > 0x15) ? 0xFF : 0
 
     copyPixels: (ctx, srcRect, destPt) ->
         ctx.putImageData srcRect, destPt.x, destPt.y
