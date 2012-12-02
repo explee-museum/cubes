@@ -65,19 +65,22 @@ $ ->
 
         # Audio
         document.getElementById('speech_result').onwebkitspeechchange = (val) ->
-            switch val.target.value
-                when 'rain', 'brain', 'wayne' 
-                    game.weather = game.WEATHER_RAIN
-                when 'warm', 'test'
-                    game.weather = game.WEATHER_WARM
-                when 'snow', 'no', 'note', 'stove'
-                    game.weather = game.WEATHER_SNOW
-                when 'sun'
-                    game.weather = game.WEATHER_SUN
-                else
-                    game.weather = game.WEATHER_SUN
+            if game.resources[game.MANA] >= 10
+                game.resources[game.MANA] -= 10
+
+                switch val.target.value
+                    when 'rain', 'brain', 'wayne'
+                        game.weather = game.WEATHER_RAIN
+                    when 'warm', 'test'
+                        game.weather = game.WEATHER_WARM
+                    when 'snow', 'no', 'note', 'stove'
+                        game.weather = game.WEATHER_SNOW
+                    when 'sun'
+                        game.weather = game.WEATHER_SUN
+                    else
+                        game.resources[game.MANA] += 10
             
-            game.drawWeather ctxWeather
+                game.drawWeather ctxWeather
 
         $('canvas').click (event) ->
             console.log event.pageX

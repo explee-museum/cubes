@@ -186,7 +186,8 @@ class Game
 
 
         for boat in @boats
-            if !boat.navigate()
+
+            if @map.tiles[Math.round((boat.posX)+10/50)][Math.round((boat.posY)+10/50)].type == "water" and !boat.navigate()
 
                 if @technologies[@MAP]
 
@@ -403,14 +404,18 @@ class Game
 
 
         peoplesToDel = []
-        for people ,k in @peoples
+        for people in @peoples
+            #check if they are in water
+            if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
+                people.isDead = true;
+            #remove dead people
             if people.isDead
                 people.timeDead++
                 if people.timeDead > 5
-                    peoplesToDel.push k
+                    peoplesToDel.push people
 
         for iPeople in peoplesToDel
-            @peoples.splice iPeople, 1
+            @peoples.splice(@peoples.indexOf(iPeople), 1)
 
 
 
@@ -480,7 +485,7 @@ class Game
                     if @map.tiles[i][j].type == "mountain" then mountainCount++
             if mountainCount > 2 then @discover @TECH_WHEEL
 
-        if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @alivePeople > 50
+        if !@technologies[@TECH_AGRICULTURE] and @technologies[@TECH_WHEEL] and @alivePeople > 50 and @weather == @WEATHER_WARM
             @discover @TECH_AGRICULTURE
 
         if !@technologies[@TECH_BREEDING] and @technologies[@TECH_FIRE]
