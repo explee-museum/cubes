@@ -8,15 +8,14 @@ class Video
         @fakeDuration = 0
 
         @lastFrame = @frame = null
+        @sizeTile = 50
 
     update: () ->        
         # Plug the video element to canvas
         @ctxVideoBack.drawImage @webcam, 0, 0, @webcam.width, @webcam.height
 
-        # rBounds = BlobDetector.detect(35, 50, ctx)
-        bBounds = @blobDetector.detect 185, 210
-        # gBounds = BlobDetector.detect(90, 105, ctx)        
-        bb = @cv.convertBounds bBounds, @canvasVideoFront, @canvasVideoDebug
+        result = @blobDetector.detect()
+        sizedBounds = @cv.convertBounds result.bounds, @canvasVideoFront, @canvasVideoDebug
         
         @frame = @ctxVideoBack.getImageData(0, 0, @canvasVideoBack.width, @canvasVideoBack.height)
         if @lastFrame is null then @lastFrame = @frame
@@ -31,8 +30,8 @@ class Video
             # ctx.fillRect(Math.floor(bBounds.x), Math.floor(bBounds.y), 5, 5)            
             # ctx.fillRect(Math.floor(gBounds.x), Math.floor(gBounds.y), 5, 5)
             
-            @tilex = Math.floor(bb.x/50)
-            @tiley = Math.floor(bb.y/50)
+            @tilex = Math.floor((@canvasVideoDebug.width  - sizedBounds.x)/@sizeTile)
+            @tiley = Math.floor(sizedBounds.y/@sizeTile)
             if(@tilex is @savedTilex && @tiley is @savedTiley)
                 @fakeDuration++
             else
@@ -41,13 +40,14 @@ class Video
             @savedTiley = @tiley
 
             if @fakeDuration > 25
-                @game.map.addMapElement 'grass', @tilex, @tiley, @ctxVideoBack
+                @game.map.addMapElement result.type, @tilex, @tiley, @ctxVideoBack
                 @active = false
                 @savedTilex = null
                 @fakeDuration = 0
 
-            @ctxVideoDebug.fillStyle = 'red'
-            @ctxVideoDebug.fillRect(50 * @tilex, 50 * @tiley, 50, 50)
+            @ctxVideoDebug.fillStyle = 'white'
+            @ctxVideoDebug.globalAlpha =  0.5
+            @ctxVideoDebug.fillRect(@sizeTile * @tilex, @sizeTile * @tiley, @sizeTile, @sizeTile)
                 
 
 if typeof module isnt 'undefined' && module.exports

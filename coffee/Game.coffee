@@ -103,9 +103,9 @@ class Game
 
     init: () ->
         # First, we initialize all the spritesheets
-        @map = new Map(@width, @height)
+        @map = new Map(@ctxBack, @width, @height)
         @map.init()
-        @map.draw(@ctxBack)
+        @map.draw()
 
         @resources = [10,10,50]
 
@@ -133,20 +133,9 @@ class Game
         document.getElementById('food_count').innerHTML = @resources[1]
         document.getElementById('wood_count').innerHTML = @resources[2]
 
-
-
-
         if @realInterval % 30 == 0
             @nextTurn()
             @addWeatherElements()
-
-            for t in @technologies
-                if t
-                    @score += 2
-
-            @score += @peoples.length
-
-            document.getElementById('score').innerHTML = @score
 
         # if @realInterval % 50 == 0
             # document.getElementById('technos').innerHTML = ''

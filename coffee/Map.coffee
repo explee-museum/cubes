@@ -1,5 +1,5 @@
 class Map
-    constructor: (width, height, @tiles=[]) ->
+    constructor: (@ctx, width, height, @tiles=[]) ->
         @sizeCase = 50
         @widthMap = Math.round(width / @sizeCase)
         @heightMap = Math.round(height / @sizeCase)
@@ -35,7 +35,6 @@ class Map
                 @addShiny i, j
 
     addShiny: (i, j) ->
-
         if @tiles[i][j].type != 'water'
             if @tiles[i-1][j]? && @tiles[i-1][j].type != @tiles[i][j].type
                 for k in [0..4]
@@ -64,21 +63,17 @@ class Map
     randomMap: () ->
         console.log 'randomize'
         
-    addMapElement: (type, i, j, ctx) ->
+    addMapElement: (type, i, j) ->        
         @tiles[i][j] = new MapElement type, @spritesheet, @sizeCase
         @addShiny i, j
-        @draw ctx
+        @draw()
 
-    draw: (ctx) ->
+    draw: () ->
         for i in [0..@widthMap]
             for j in [0..@heightMap]
-                @tiles[i][j].draw ctx, i, j
-
-
-
+                @tiles[i][j].draw @ctx, i, j
 
 if typeof module isnt 'undefined' && module.exports
     exports.Map = Map
 else 
     window.Map = Map
-     

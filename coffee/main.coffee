@@ -39,12 +39,16 @@ $ ->
         window.game = game
 
         # Video
-        window.webcam = document.getElementById 'webcam'
+        webcam = document.getElementById 'webcam'
+        window.webcam = webcam
+
         frontVideoCanvas = document.getElementById 'frontVideo'
         frontVideoCtx = frontVideoCanvas.getContext '2d'
+        window.frontVideoCanvas = frontVideoCanvas
 
         backVideoCanvas = document.getElementById 'backVideo'
         backVideoCtx = backVideoCanvas.getContext '2d'
+        window.backVideoCtx = backVideoCtx
 
         debugVideoCanvas = document.getElementById 'frontVideoDebug'
         debugVideoCtx = debugVideoCanvas.getContext '2d'
@@ -58,8 +62,7 @@ $ ->
         blobDetector = new BlobDetector(Cv, backVideoCanvas);
         window.blobDetector = blobDetector
 
-        video = new Video window.webcam, frontVideoCanvas, frontVideoCtx, backVideoCanvas, backVideoCtx, debugVideoCanvas, debugVideoCtx, game
-        console.log 'ttttttttertertzertzrtzet'
+        video = new Video webcam, frontVideoCanvas, frontVideoCtx, backVideoCanvas, backVideoCtx, debugCanvas, debugCtx, game        
         window.video = video
         
 
