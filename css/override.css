@@ -103,8 +103,6 @@ html, body {
     color: white;
 }
 
-
-
 /* Video section */
 #webcam, #backVideo {
             display: none;
@@ -114,6 +112,7 @@ html, body {
             z-index: 3;
         }
 #frontVideo {
+    display: none;
     position: absolute;
     top:50px;
     left:0;
