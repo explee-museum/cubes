@@ -24,7 +24,7 @@
             Decoded frames: 0 Avg: 0<br>
             Dropped frames: 0 Avg: 0<br>
         </div> -->
-        <div id="color">color</div>
+        <!-- <div id="color">color</div> -->
         <div id="pop">
             <div id="pop_count"></div>
             <div id="mana_count"></div>
@@ -59,6 +59,20 @@
             <img src="img/cloud.png" >
             <img src="img/boat.png" >
         </div>
+        
+        <script type="text/javascript">
+
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-36756319-1']);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+
+        </script>
         
         <script src="js/main.js"></script>
         <script src="js/WeatherElement.js"></script>
@@ -95,16 +109,16 @@
             })();
 
             //Color picker
-            var mousex = mousey = 0;
-            var offset = $('#frontVideo').offset(); 
-            var colorDiv = $('#color');
-            $('#frontVideo').mousemove(function(e){
-                console.log('mousemove');
-                mousex = Math.floor(e.pageX - offset.left);
-                mousey = Math.floor(e.pageY - offset.top);
-                colorStr = blobDetector.getPixelColor($('backVideo').getContext('2d'), mousex, mousey);
-                colorDiv.innerHTML = colorStr;
-            });
+            // var mousex = mousey = 0;
+            // var offset = $('#frontVideo').offset(); 
+            // var colorDiv = $('#color');
+            // $('#frontVideo').mousemove(function(e){
+            //     mousex = Math.floor(e.pageX - offset.left);
+            //     mousey = Math.floor(e.pageY - offset.top);
+            //     var ctx = document.getElementById('backVideo').getContext('2d');
+            //     colorStr = blobDetector.getPixelColor(mousex, mousey);
+            //     colorDiv.innerHTML = colorStr;
+            // });
 
             var log = document.getElementById('log');
             function update() {
