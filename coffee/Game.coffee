@@ -307,7 +307,7 @@ class Game
     nextTurn: () ->
         console.log "nextTurn"
 
-        @resources[@MANA]++
+        
         oldWeather = @weather
 
         foodCapacity = 20
@@ -340,8 +340,10 @@ class Game
          #basic food capacity
         foodToAdd = 0
         woodToAdd = 0
+        manaToAdd = 1
         maxPeople = 5 #basic max of people
-        
+        maxMana = 15
+
         for boat in @boats
             x = Math.round(boat.posX/50)
             y = Math.round(boat.posY/50)
@@ -356,7 +358,8 @@ class Game
             @map.tiles[building.posX][building.posY].res--
             switch building.type
                 when @BUILDING_TYPE_TEMPLE
-                    @resources[@MANA]++
+                    manaToAdd++;
+                    maxMana +=15
                 
                 when @BUILDING_TYPE_FARM
                     foodToAdd += @FOOD_FARM
@@ -379,6 +382,9 @@ class Game
                     else
                         maxPeople += 9
 
+        if @resources[@MANA]+manaToAdd > maxMana
+            manaToAdd = maxMana - @resources[@MANA] 
+
         if @resources[@FOOD]+foodToAdd > foodCapacity
             #Our peoples need more granary!
             @priorities[@PRIORITY_GRANARY] = foodToAdd
@@ -389,6 +395,7 @@ class Game
 
         @resources[@FOOD] += foodToAdd
         @resources[@WOOD] += woodToAdd
+        @resources[@MANA] += manaToAdd
 
 
         
