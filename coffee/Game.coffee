@@ -78,6 +78,7 @@ class Game
         @FOOD_PASTURE = 12
         @FOOD_HUNTING = 4
         @FOOD_HUNTING_FIRE = 6
+        @FOOD_BOAT = 2
 
         #TECH
         @TECH_FIRE = 0
@@ -108,10 +109,6 @@ class Game
 
         for i in [1..10]
             @addPeople()
-
-        # for i in [1..5]
-        #     @boats.push new Boat 100*i, 10*i
-
 
         #Then we start with 1 House, 2 hunting lodge, and 1 sawmill
         @build @BUILDING_TYPE_HOUSE
@@ -190,23 +187,23 @@ class Game
             if !boat.navigate()
 
                 if @technologies[@MAP]
-                    j = boat.srcX+Math.round (Math.random() * 5 -2)
-                    i = boat.srcY+Math.round (Math.random() * 5 -2)
 
-                    while (@map.tiles[i][j].type != "water")
-                        j = boat.srcX+Math.round (Math.random() * 5 -2)
-                        i = boat.srcY+Math.round (Math.random() * 5 -2)
+                    j = boat.srcY+Math.round (Math.random() * 5 -2)
+                    i = boat.srcX+Math.round (Math.random() * 5 -2)
+                    while (i>0 and j>0 and i< @map.widthMap and j < @map.heightMap and @map.tiles[i][j].type != "water")
+                        j = boat.srcY+Math.round (Math.random() * 5 -2)
+                        i = boat.srcX+Math.round (Math.random() * 5 -2)
 
-                    boat.findNewGoal i*50,j*50
+                    boat.findNewGoal i*50+10, j*50+10
                 else
-                    j = boat.srcX+Math.round (Math.random() * 3 -1)
-                    i = boat.srcY+Math.round (Math.random() * 3 -1)
 
-                    while (@map.tiles[i][j].type != "water")
-                        j = boat.srcX+Math.round (Math.random() * 3 -1)
-                        i = boat.srcY+Math.round (Math.random() * 3 -1)
+                    j = boat.srcY+Math.round (Math.random() * 3 -1)
+                    i = boat.srcX+Math.round (Math.random() * 3 -1)
+                    while (i>0 and j>0 and i< @map.widthMap and j < @map.heightMap and @map.tiles[i][j].type != "water")
+                        j = boat.srcY+Math.round (Math.random() * 3 -1)
+                        i = boat.srcX+Math.round (Math.random() * 3 -1)
 
-                    boat.findNewGoal i*50,j*50
+                    boat.findNewGoal i*50+10, j*50+10
 
             boat.draw @ctxFront
 
@@ -320,7 +317,7 @@ class Game
         for boat in @boats
             x = Math.round(boat.posX/50)
             y = Math.round(boat.posY/50)
-            if @map.tiles[x][y].res > 0 and @map.tiles[x][y] = "water"
+            if @map.tiles[x][y]? and @map.tiles[x][y].res > 0 and @map.tiles[x][y] == "water"
                 @map.tiles[x][y].res--
                 foodToAdd += @FOOD_BOAT
 
@@ -540,7 +537,7 @@ class Game
                 else
                     @priorities[@PRIORITY_WOOD] += @TEMPLE_COST
             when @PRIORITY_FOOD
-                if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR > 0 and @resources[@WOOD] > @BOAT_COST
+                if @technologies[@TECH_FISH] and @BUILDING_NUMBER_HARBOR > 0 and @resources[@WOOD] > @BOAT_COST and @boats.length < 5
                     @buildABoat()
                     @priorities[@PRIORITY_FOOD] = 0
                 else if @build(@BUILDING_TYPE_PASTURE) or @build(@BUILDING_TYPE_FARM) or @build(@BUILDING_TYPE_HUNTING_LODGE)
@@ -565,12 +562,12 @@ class Game
     buildABoat: () ->
         harborList = []
         for building in @buildings
-            if building.type == BUILDING_TYPE_HARBOR
+            if building.type == @BUILDING_TYPE_HARBOR
                 harborList.push(building)
         if harborList.length > 0
             i = Math.round(Math.random() * harborList.length)
             building = harborList[i]
-            boats.push(new Boat building.posX*50, building.posY*50)
+            @boats.push(new Boat building.posX*50, building.posY*50)
 
 
 
@@ -717,7 +714,9 @@ class Game
     #find a slot for a building. Return coord of this slot, or [-1,-1] if not found :(
     findSlot: (searchType) ->
         results = []
+        
         if searchType == "harbor"
+            console.log "I GONNA BUILD A HARBOR :) "
             for i in [0..@map.widthMap]
                 for j in [0..@map.heightMap]
                   # console.log "searching for : " + searchType + " | but i have : " + @map.tiles[i][j].type
@@ -742,8 +741,8 @@ class Game
                     # console.log "@map.tiles[i][j].building : " + @map.tiles[i][j].building
                     results.push([i,j])
         if results.length > 0
-            i = Math.round(Math.random() * results.length)
-            return results[i]
+            index = Math.round(Math.random() * results.length)
+            return results[index]
         return [-1,-1]
 
 

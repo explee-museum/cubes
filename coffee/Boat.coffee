@@ -26,8 +26,8 @@ class Boat
         if @posY < @goal[1]
             dirY = 1
 
-        @posX += Math.floor(Math.random() * 5) - 2 + dirX
-        @posY += Math.floor(Math.random() * 5) - 2 + dirY
+        @posX += dirX*0.5
+        @posY += dirY*0.5
         return true
 
     findNewGoal: (x, y) ->
