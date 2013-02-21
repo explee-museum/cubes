@@ -15,7 +15,6 @@ html, body {
     position: absolute;
     z-index: 1;
     overflow: hidden;
-    /*background: green;*/
 }
 
 #weather {
@@ -238,7 +237,17 @@ b {
 #main #play:hover {
     cursor: pointer;
     background: url(../img/playHover.png) no-repeat;
+}
 
+#loading p {
+    position: absolute;
+    top:50%;
+    left:50%;
+    width:300px;
+    height:40px;
+    margin-left:-150px;
+    margin-top: -20px;
+    font-size: 4em;
 }
 
 footer {
@@ -252,3 +261,4 @@ footer {
     font-size: 1.2em;
     color:white;
 }
+

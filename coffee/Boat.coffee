@@ -30,9 +30,7 @@ class Boat
         return true
 
     findNewGoal: (x, y) ->
-        #console.log "GOING TO " + x + "," + y
         @goal = [x,y]
-
 
     draw: (ctx) ->
         ctx.drawImage @image, 0, 0, 10, 20, @posX, @posY, 10, 20

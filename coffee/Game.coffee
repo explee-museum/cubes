@@ -60,11 +60,10 @@ class Game
         @SAWMILL_COST = 10
         @BOAT_COST = 5
 
-        #DIVERS
+        #MISC
         @FOOD_COMSUPTION = 1
         @MAX_AGE = 50
         @DEATH_FROM_ICE = 0
-
 
         #PRIORITIES
         @PRIORITY_IDDLE = 0
@@ -95,14 +94,13 @@ class Game
 
         @TECH_FISH = 10
 
-        #resources
+        #Resources
         @MANA = 0
         @FOOD = 1
         @WOOD = 2
 
 
     init: () ->
-        # First, we initialize all the spritesheets
         @map = new Map(@ctxBack, @width, @height)
         @map.init()
         @map.draw()
@@ -117,7 +115,6 @@ class Game
         @build @BUILDING_TYPE_HUNTING_LODGE
         @build @BUILDING_TYPE_HUNTING_LODGE
         @build @BUILDING_TYPE_SAWMILL 
-
 
         @priorities = [0,0,0,0,0,0,0]
         @technologies = [false, false, false, false, false, false, false, false, false, false, false, false]
@@ -137,14 +134,10 @@ class Game
             @nextTurn()
             @addWeatherElements()
 
-        # if @realInterval % 50 == 0
-            # document.getElementById('technos').innerHTML = ''
-
-
         # Check for end of the game
         if @alivePeople < 1
             clearInterval @interval
-            
+
             scoreTech = 1
             for tech in @technologies
                 if tech
@@ -152,7 +145,6 @@ class Game
 
             @score = scoreTech + @maxPop*4 + @buildings.length*10 + @boats.length*2
             document.getElementById('count').innerHTML = @score
-
 
         if @weatherDraw
             @ctxWeather.clearRect 0, 0, @width, @height
@@ -172,7 +164,6 @@ class Game
                 elem.posY += 1
                 elem.draw @ctxWeather
 
-
         # Perform actions
         for people in @peoples
             if !people.isDead and !people.walk()
@@ -186,7 +177,6 @@ class Game
                 people.findNewGoal i*50,j*50
 
             people.draw @ctxFront
-
 
         for boat in @boats
             mx = Math.floor(boat.posX/50 +0.5)
@@ -220,7 +210,6 @@ class Game
         @realInterval += 1
 
     addPeople: () ->
-
         #trying to find a house to spawn new people
         houses = []
         for building in @buildings
@@ -253,8 +242,6 @@ class Game
         else if @weather == @WEATHER_WARM
             console.log 'warm'
 
-
-
         else if @weather == @WEATHER_RAIN
             @ctxWeather.globalAlpha = 0.2
 
@@ -277,8 +264,6 @@ class Game
             @weatherDraw = true
 
         else if @weather == @WEATHER_WARM
-            console.log 'warm'
-
             @weatherElements = []
             @ctxWeather.clearRect 0, 0, @width, @height
 
@@ -300,14 +285,10 @@ class Game
             @weatherDraw = true
                 
         else
-            console.log 'else'
             @ctxWeather.globalAlpha = 0
             @ctxWeather.clearRect 0, 0, @width, @height
 
     nextTurn: () ->
-        console.log "nextTurn"
-
-        
         oldWeather = @weather
 
         foodCapacity = 20
@@ -319,9 +300,6 @@ class Game
                     foodCapacity += 30
             if building.type == @BUILDING_TYPE_SAWMILL
                     woodCapacity += 20
-
-
-
 
         @alivePeople = @peoples.length
         for people in @peoples
@@ -337,7 +315,7 @@ class Game
             @priorities[@PRIORITY_FOOD] = (foodCapacity - @resources[@FOOD])/3
             @resources[@FOOD] -= sum
 
-         #basic food capacity
+        #basic food capacity
         foodToAdd = 0
         woodToAdd = 0
         manaToAdd = 1
@@ -397,12 +375,6 @@ class Game
         @resources[@WOOD] += woodToAdd
         @resources[@MANA] += manaToAdd
 
-
-        
-        #Calculate if we need to build more temples
-        console.log "We are "+@alivePeople
-        console.log "They gonna die : "+numberOfDeath
-
         #kill peoples
         killCounter = numberOfDeath
         while killCounter > 0
@@ -410,16 +382,15 @@ class Game
            if !@peoples[deadIndex].isDead
                 killCounter--
                 @peoples[deadIndex].isDead = true
-            #@peoples.splice deadIndex, 1
-
-
 
         peoplesToDel = []
         for people in @peoples
-            #check if they are in water
+            # @TODO
+            # Check if they are in water
             #if @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)]? and @map.tiles[Math.round(people.posX/50+0.5)][Math.round(people.posY/50+0.5)].type == "water"
             #    console.log "YIHAA, ON WATER"
             #    people.isDead = true;
+            
             #remove dead people
             if people.isDead
                 people.timeDead++
@@ -460,13 +431,8 @@ class Game
         #build buildings! (only 1 per turn)
         maxIndex = 0
         for priority,k in @priorities
-            #console.log "in loop : k = " + k + "| priority = " + priority
             if priority > @priorities[maxIndex]
                 maxIndex = k
-        #console.log "______________________________________________________________"
-        #console.log "Want to build food : " + @priorities[@PRIORITY_FOOD]
-        #console.log "PRIORITY : " + maxIndex + "| Value : " + @priorities[maxIndex]
-        
 
         @commonSenseBuild maxIndex
 
@@ -483,8 +449,6 @@ class Game
                         killCounter--
                         @peoples[deadIndex].isDead = true
                         @DEATH_FROM_ICE++
-
-
 
         #discover Technologies
         if !@technologies[@TECH_FIRE] and @weather == @WEATHER_RAIN and @DEATH_FROM_ICE >= 5

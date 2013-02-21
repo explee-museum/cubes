@@ -54,13 +54,10 @@ class Building
                     for i in [0..1]
                         @spriteElems.push new SpriteElement spritesheet, i, 14+j
 
-        # console.log @spriteElems
-
     draw: (ctx) ->
         x = @posX*50 + 2*10
         y = @posY*50 + 2*10
 
-        # console.log @spriteElems
         ctx.drawImage @spriteElems[0].spritesheet.image, @spriteElems[0].i*10, @spriteElems[0].j*10, 10, 10, x, y, 10, 10
         ctx.drawImage @spriteElems[1].spritesheet.image, @spriteElems[1].i*10, @spriteElems[1].j*10, 10, 10, x+10, y, 10, 10
         ctx.drawImage @spriteElems[2].spritesheet.image, @spriteElems[2].i*10, @spriteElems[2].j*10, 10, 10, x, y+10, 10, 10
