@@ -49,7 +49,4 @@ class Stats
         @video.src = url
         @video.play()
 
-if typeof module isnt 'undefined' && module.exports
-    exports.Stats = Stats
-else 
-    window.Stats = Stats
+window.Stats = Stats

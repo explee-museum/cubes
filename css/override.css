@@ -112,7 +112,7 @@ html, body {
             z-index: 3;
         }
 #frontVideo {
-    display: none;
+    /*display: none;*/
     position: absolute;
     top:50px;
     left:0;

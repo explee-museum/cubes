@@ -18,11 +18,11 @@ class Video
         sizedBounds = @cv.convertBounds result.bounds, @canvasVideoFront, @canvasVideoDebug
         
         @frame = @ctxVideoBack.getImageData(0, 0, @canvasVideoBack.width, @canvasVideoBack.height)
-        if @lastFrame is null then @lastFrame = @frame
+        if @lastFrame is null then @lastFrame = @lastFrame
         isOnZone = @blobDetector.blend(@lastFrame, @frame, @ctxVideoFront)
         if (isOnZone and @active is false) then @active = true
         @lastFrame = @frame
-
+        resetDuration = 0
         @canvasVideoDebug.width = @canvasVideoDebug.width
         if @active          
             
@@ -36,21 +36,24 @@ class Video
             @savedTiley = @tiley
 
             if @fakeDuration > 25
-                if result.type isnt @game.map.tiles[@tilex][@tiley].type
-                    buildingIndex = @game.buildings.indexOf(@game.map.tiles[@tilex][@tiley].building)                    
-                    @game.buildings.splice(buildingIndex, 1)
+                if @game.resources[@game.MANA] > 6
+                    @game.resources[@game.MANA] -= 7
+                    if result.type isnt @game.map.tiles[@tilex][@tiley].type
+                        buildingIndex = @game.buildings.indexOf(@game.map.tiles[@tilex][@tiley].building)                    
+                        @game.buildings.splice(buildingIndex, 1)
 
-                @game.map.addMapElement result.type, @tilex, @tiley, @ctxVideoBack
+                    @game.map.addMapElement result.type, @tilex, @tiley, @ctxVideoBack
                 @active = false
                 @savedTilex = null
                 @fakeDuration = 0
+
+            if resetDuration > 300
+                @fakeDuration = @resetDuration = 0
+
+            resetDuration++
 
             @ctxVideoDebug.fillStyle = 'white'
             @ctxVideoDebug.globalAlpha =  0.5
             @ctxVideoDebug.fillRect(@sizeTile * @tilex, @sizeTile * @tiley, @sizeTile, @sizeTile)
                 
-
-if typeof module isnt 'undefined' && module.exports
-    exports.Video = Video
-else 
-    window.Video = Video
+window.Video = Video

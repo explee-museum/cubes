@@ -1,15 +1,14 @@
 class Boat
     constructor: (@posX, @posY) ->
-        @srcX = Math.round(@posX/50)
-        @srcY = Math.round(@posY/50)
+        @srcX = Math.floor(@posX/50)
+        @srcY = Math.floor(@posY/50)
         @age = 0
         @goal = [-1,-1]
         @image = new Image()
         @image.src = 'img/boat.png'
 
     navigate: () ->
-        if @goal[0] < 0
-            return false
+        if @goal[0] < 0 then return false
 
         #to find a new destination
         if Math.abs(@goal[0] - @posX) < 3 and Math.abs(@goal[1] - @posY) < 3

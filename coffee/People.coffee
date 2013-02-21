@@ -44,7 +44,4 @@ class People
         @spriteElement.i = 1
         @spriteElement.j = 0
 
-if typeof module isnt 'undefined' && module.exports
-    exports.People = People
-else 
-    window.People = People
+window.People = People

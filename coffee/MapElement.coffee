@@ -43,10 +43,6 @@ class MapElement
         numTem = Math.round(Math.random() * (sprites.length-1))
         @tiles[i][j] = sprites[numTem]
                     
-
-if typeof module isnt 'undefined' && module.exports
-    exports.MapElement = MapElement
-else 
-    window.MapElement = MapElement
+window.MapElement = MapElement
      
     

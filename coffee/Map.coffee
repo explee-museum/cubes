@@ -73,7 +73,4 @@ class Map
             for j in [0..@heightMap]
                 @tiles[i][j].draw @ctx, i, j
 
-if typeof module isnt 'undefined' && module.exports
-    exports.Map = Map
-else 
-    window.Map = Map
+window.Map = Map

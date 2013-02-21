@@ -32,7 +32,4 @@ class Snow extends WeatherElement
     draw: (ctx) ->
         ctx.drawImage @image, @posX, @posY, @width, @height
 
-if typeof module isnt 'undefined' && module.exports
-    exports.Snow = Snow
-else 
-    window.Snow = Snow
+window.Snow = Snow

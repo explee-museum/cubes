@@ -1,73 +1,76 @@
 class BlobDetector
-    constructor: (@cv, @canvas, @filters) ->
+    constructor: (@cv, @canvas) ->
         @ctx = @canvas.getContext '2d'
 
     process: () ->
         imageData = @ctx.getImageData 0, 0, @canvas.width, @canvas.height
         r1 = @getDiffImage imageData
         r2 = @getBlocks r1
-        r3 = drawBlobs imageData
+        r3 = @drawBlobs imageData
         return [r1, r2, r3]
 
     getDiffImage: (imageData) ->
-        pt = 
-            x: 0
-            y: 0
+        # Copy the image
         originalImageData = imageData
 
+        # we translate the image to the rigth
         @ctx.translate 2, 0
-        r = @ctx.getImageData 0, 0, @canvas.width, @canvas.height 
-        r.data = @filters.filter(filter.blend, r, originalImageData, rect, 2, 'difference')
-        tmpRect =
+        # we grab the image
+        tmp = @ctx.getImageData 0, 0, @canvas.width, @canvas.height 
+        # We blend it with its original form with a diff filter
+        blend1 = @cv.blend tmp, originalImageData, 'difference'
+        # We copy back the 2 columns from the original image to the blend one
+        destPt = #destination pixel for copied pixels
+            x: 0
+            y: 0        
+        srcRect = # src pixels to cpy
             x: 2
             y: 0 
             w: 2
             h: imageData.height
-        r.data = @copyPixels originalImageData, tmpRect, pt
+        @cv.copyPixels originalImageData, srcRect, blend1, destPt
 
+        # We do that again with a moov downwards
         @ctx.translate -2, 2
-        r2 = @ctx.getImageData 0, 0, @canvas.width, @canvas.height 
-        r2.data = @filters.filter(filter.blend, r2, originalImageData, rect, 2, 'difference')
-        tmpRect =
+        tmp = @ctx.getImageData 0, 0, @canvas.width, @canvas.height 
+        blend2 = @cv.blend tmp, originalImageData, 'difference'
+        srcRect =
             x: 0,
             y: 2, 
             w: imageData.width,
             h: 2
-        r2.data = @copyPixels originalImageData, tmpRect, pt
+        @cv.copyPixels originalImageData, srcRect, blend2, destPt
 
+        #we blend the two result with an add filter
         rect =
             x: 0,
             y: 0, 
-            w: imageData.width, 
+            w: 2, 
             h: imageData.height
-        pt = {0, 0}
         # Not sure about that
-        r.data = @filters.filter(filter.blend, r, r2, rect, 2, 'add')        
+        finalBlend = @cv.blend blend1, blend2, 'add'
 
+        # We blur it with a convolution matrix (remove noise)
         weight = [
             0.1,0.1,0.1,
             0.1,0.1,0.1,
             0.1,0.1,0.1
         ]
-        r = @filters.convolution r, weight, 0
+        finalImg = @cv.convolute finalBlend, weight, true 
 
-        # We discover what is interesting
-        r = @filters.threshold r, "<", 10, 0
+        # threshold to get what we want
+        finalImg = @cv.threshold finalImg, "<", 10, 0
         # We remove everything else
-        r = @filters.threshold r, "!=", 233, 255 
+        finalImg = @cv.threshold finalImg, "!=", 233, 255 
     
-        return r
+        return finalImg
 
     getBlocks: (imageData) ->
-        blocks = []
+        @blocks = []
         r = @ctx.getImageData 0, 0, @canvas.width, @canvas.height
-
-        while true
-            i++
-            if i>1000 then break
             
         rect1 = @getColorBoundsRect(r, 'ffffff','ff00ff')
-        if rect1? then return
+        if not rect1? then return
 
         x = rect1.x
         for y in [rect1.y..rect1.y + rect1.height-1]
@@ -82,14 +85,14 @@ class BlobDetector
                         rect: rect2
                         bmpd: @ctx.getImageData o.rect.width,o.rect.height
                     r.imageData = o.bmpd.data r, o.rect, 
-                    blocks.push o
+                    @blocks.push o
         
         ctx.fillStyle = "00ff00"
         ctx.fillRect x, y, 1, 1
 
-        for i in [0..blocks.length-1]
+        for i in [0..@blocks.length-1]
             @ctx.strokeStyle = "00ff00"
-            g.drawRect(blocks[i].rect.x, blocks[i].rect.y, blocks[i].rect.width, blocks[i].rect.height)
+            g.drawRect(@blocks[i].rect.x, @blocks[i].rect.y, @blocks[i].rect.width, @blocks[i].rect.height)
 
         r.draw(sp)
         return r
@@ -97,9 +100,9 @@ class BlobDetector
     drawBlobs: (imageData) ->
         r = @ctx.getImageData 0, 0, @canvas.width, @canvas.height                
 
-        for i in [0..blocks.length-1]
+        for i in [0..@blocks.length-1]
             pts = []
-            b = blocks[i]
+            b = @blocks[i]
             for y in [0..b.rect.height-1]
                 for x in [0..b.rect.width-1]
                     if b.bmpd.getPixel(x,y) is 0xff00ff
