@@ -2,7 +2,6 @@ class WeatherElement
     constructor: (@posX=0, @posY=0) ->
 
 
-
 class Cloud extends WeatherElement
     constructor: (@posX=0, @posY=0) ->
         @image = new Image()
