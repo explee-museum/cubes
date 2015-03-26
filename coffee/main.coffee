@@ -18,19 +18,19 @@ window.onload = () ->
     ctxWeather = canvasWeather.getContext '2d'
 
     # initialize size
-    canvasBack.width = document.width
-    canvasBack.height = document.height
+    canvasBack.width = document.body.clientWidth
+    canvasBack.height = document.body.clientHeight
 
-    canvasFront.width = document.width
-    canvasFront.height = document.height
+    canvasFront.width = document.body.clientWidth
+    canvasFront.height = document.body.clientHeight
 
-    canvasDebug.width = document.width
-    canvasDebug.height = document.height
+    canvasDebug.width = document.body.clientWidth
+    canvasDebug.height = document.body.clientHeight
 
-    canvasWeather.width = document.width
-    canvasWeather.height = document.height
+    canvasWeather.width = document.body.clientWidth
+    canvasWeather.height = document.body.clientHeight
 
-    game = new Game ctxFront, ctxBack, ctxWeather, document.width, document.height
+    game = new Game ctxFront, ctxBack, ctxWeather, document.body.clientWidth, document.body.clientHeight
     game.init()        
     window.game = game
 

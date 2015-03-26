@@ -18,7 +18,7 @@ class Video
         sizedBounds = @cv.convertBounds result.bounds, @canvasVideoFront, @canvasVideoDebug
         
         @frame = @ctxVideoBack.getImageData(0, 0, @canvasVideoBack.width, @canvasVideoBack.height)
-        if @lastFrame is null then @lastFrame = @lastFrame
+        if @lastFrame is null then @lastFrame = @frame
         isOnZone = @blobDetector.blend(@lastFrame, @frame, @ctxVideoFront)
         if (isOnZone and @active is false) then @active = true
         @lastFrame = @frame

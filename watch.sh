@@ -1,2 +1,2 @@
 #!/bin/bash
-coffee --compile --watch --output lib/ coffee/*.coffee
+coffee --compile --watch --output js/ coffee/*.coffee

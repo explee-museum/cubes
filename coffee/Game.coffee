@@ -581,7 +581,7 @@ class Game
             if building.type == @BUILDING_TYPE_HARBOR
                 harborList.push(building)
         if harborList.length > 0
-            indn = Math.round(Math.random() * harborList.length)
+            indn = Math.floor(Math.random() * harborList.length)
             building = harborList[indn]
             @boats.push(new Boat building.posX*50, building.posY*50)
 
